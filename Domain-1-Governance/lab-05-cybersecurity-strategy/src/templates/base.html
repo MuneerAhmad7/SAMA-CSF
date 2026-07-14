@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Falak Pay — Cybersecurity Strategy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="sidebar no-print">
+  <div class="brand">🛡 Falak Pay
+    <small>Cybersecurity Strategy — Lab 05</small>
+  </div>
+  <nav>
+    <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+    <a href="{{ url_for('strategy') }}">📄 Strategy Builder</a>
+    <a href="{{ url_for('maturity') }}">📈 Maturity Assessment</a>
+    <a href="{{ url_for('threats') }}">🌐 Threat Landscape</a>
+    <a href="{{ url_for('roadmap') }}">🗺 Strategic Roadmap</a>
+    <a href="{{ url_for('audit') }}">📜 Audit Log</a>
+    <a href="{{ url_for('report') }}">🖨 Printable Strategy</a>
+  </nav>
+</div>
+<div class="main">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}<div class="flash">{{ messages[0] }}</div>{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

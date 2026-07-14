@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>KPI / KRI Tracking</h2>
+<form method="post" class="row g-2 bg-white p-3 rounded mb-4 shadow-sm">
+  <div class="col-md-4"><input class="form-control" name="name" placeholder="Metric name" required></div>
+  <div class="col-md-2"><input class="form-control" name="target" placeholder="Target"></div>
+  <div class="col-md-2"><input class="form-control" name="actual" placeholder="Actual"></div>
+  <div class="col-md-2">
+    <select class="form-select" name="status">
+      <option>Green</option><option>Amber</option><option>Red</option>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-primary w-100">Add</button></div>
+</form>
+
+<table class="table table-bordered bg-white">
+  <thead><tr><th>Metric</th><th>Target</th><th>Actual</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for m in metrics %}
+    <tr class="{% if m.status=='Green' %}rag-green{% elif m.status=='Amber' %}rag-amber{% else %}rag-red{% endif %}">
+      <td>{{ m.name }}</td><td>{{ m.target }}</td><td>{{ m.actual }}</td><td>{{ m.status }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

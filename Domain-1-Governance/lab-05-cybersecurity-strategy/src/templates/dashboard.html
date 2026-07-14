@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Cybersecurity Strategy Dashboard</h1>
+<p class="subtitle">{{ org_name }} — SAMA CSF 1.2 / NCA ECC 1‑1</p>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ completeness_pct }}%</div><div class="label">Strategy Doc Completeness</div></div>
+  <div class="metric-card"><div class="value">{{ avg_current }} / {{ avg_target }}</div><div class="label">Avg. Maturity (Current / Target)</div></div>
+  <div class="metric-card"><div class="value">{{ completion_pct }}%</div><div class="label">Roadmap Completion ({{ completed }}/{{ total_initiatives }})</div></div>
+  <div class="metric-card {% if delayed > 0 %}danger{% endif %}"><div class="value">{{ delayed }}</div><div class="label">Delayed Initiatives</div></div>
+  <div class="metric-card"><div class="value">{{ budget_utilization }}%</div><div class="label">Budget Utilization (SAR {{ "%.0f"|format(total_spent) }} / {{ "%.0f"|format(total_allocated) }})</div></div>
+  <div class="metric-card {% if high_risk_threats|length > 0 %}danger{% endif %}"><div class="value">{{ high_risk_threats|length }}</div><div class="label">High-Risk Threats Tracked</div></div>
+</div>
+
+<h2>Widest Maturity Gaps (top priority domains)</h2>
+<table>
+  <thead><tr><th>Domain</th><th>Current Level</th><th>Target Level</th><th>Gap</th></tr></thead>
+  <tbody>
+  {% for s in widest_gaps %}
+    <tr>
+      <td>{{ s.domain }}</td><td>{{ s.current_level }}</td><td>{{ s.target_level }}</td>
+      <td><strong style="color:var(--critical)">{{ s.target_level - s.current_level }}</strong></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Roadmap Progress by Phase</h2>
+<table>
+  <thead><tr><th>Phase</th><th>Initiatives</th><th>Completed</th><th>Progress</th></tr></thead>
+  <tbody>
+  {% for phase in phases %}
+    <tr>
+      <td><span class="phase-badge {{ phase|replace(' ', '-') }}">{{ phase }}</span></td>
+      <td>{{ phase_progress[phase].total }}</td>
+      <td>{{ phase_progress[phase].completed }}</td>
+      <td>
+        <div class="progress-track"><div class="progress-fill {% if phase_progress[phase].pct >= 70 %}good{% elif phase_progress[phase].pct >= 30 %}warn{% else %}bad{% endif %}" style="width:{{ phase_progress[phase].pct }}%"></div></div>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if high_risk_threats %}
+<h2>⚠ High-Risk Threats</h2>
+<table>
+  <thead><tr><th>Threat</th><th>Likelihood</th><th>Impact</th><th>Notes</th></tr></thead>
+  <tbody>
+  {% for t in high_risk_threats %}
+    <tr><td>{{ t.threat_type }}</td><td>{{ t.likelihood }}</td><td>{{ t.impact }}</td><td>{{ t.relevance_notes }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

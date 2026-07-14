@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Threat Landscape Register</h1>
+<p class="subtitle">The living assessment Sony's 2014 strategy lacked — including foreseeable geopolitical/nation-state triggers.</p>
+
+<div class="card">
+  <form method="post" class="inline-form">
+    <div class="field"><label>Threat Type</label><input name="threat_type" required placeholder="e.g. Nation-state actor" style="min-width:180px"></div>
+    <div class="field"><label>Description</label><input name="description" placeholder="brief description" style="min-width:220px"></div>
+    <div class="field"><label>Likelihood</label>
+      <select name="likelihood"><option>Low</option><option>Medium</option><option>High</option></select>
+    </div>
+    <div class="field"><label>Impact</label>
+      <select name="impact"><option>Low</option><option>Medium</option><option>High</option></select>
+    </div>
+    <div class="field"><label>Relevance Notes</label><input name="relevance_notes" placeholder="why this applies to us"></div>
+    <button class="btn">Add Threat</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Threat Type</th><th>Description</th><th>Likelihood</th><th>Impact</th><th>Risk Score</th><th>Relevance</th></tr></thead>
+  <tbody>
+  {% for t in threats %}
+    {% set score = risk_score(t.likelihood, t.impact) %}
+    <tr class="{% if score >= 6 %}risk-HIGH{% elif score >= 3 %}risk-MEDIUM{% else %}risk-LOW{% endif %}">
+      <td>{{ t.threat_type }}</td>
+      <td>{{ t.description }}</td>
+      <td>{{ t.likelihood }}</td>
+      <td>{{ t.impact }}</td>
+      <td><strong>{{ score }}</strong></td>
+      <td>{{ t.relevance_notes }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Policy Register</h2>
+<form method="post" class="row g-2 bg-white p-3 rounded mb-4 shadow-sm">
+  <div class="col-md-4"><input class="form-control" name="title" placeholder="Policy title" required></div>
+  <div class="col-md-2"><input class="form-control" name="owner" placeholder="Owner"></div>
+  <div class="col-md-2">
+    <select class="form-select" name="status">
+      <option>Draft</option><option>Under Review</option><option>Approved</option><option>Published</option>
+    </select>
+  </div>
+  <div class="col-md-1"><input class="form-control" name="version" placeholder="v1.0"></div>
+  <div class="col-md-2"><input class="form-control" type="date" name="review_date"></div>
+  <div class="col-md-1"><button class="btn btn-primary w-100">Add</button></div>
+  <div class="col-12"><input class="form-control" name="notes" placeholder="Notes / evidence link"></div>
+</form>
+
+<table class="table table-bordered bg-white">
+  <thead><tr><th>Title</th><th>Owner</th><th>Status</th><th>Version</th><th>Review Date</th><th>Notes</th></tr></thead>
+  <tbody>
+  {% for p in policies %}
+    <tr class="{% if p.review_date and p.review_date < today %}rag-red{% endif %}">
+      <td>{{ p.title }}</td><td>{{ p.owner }}</td><td>{{ p.status }}</td><td>{{ p.version }}</td>
+      <td>{{ p.review_date }}</td><td>{{ p.notes }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

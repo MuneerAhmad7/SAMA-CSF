@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-1">Security Dashboard</h2>
+<p class="text-muted">Logged in as <strong>{{ user.username }}</strong> ({{ user.role }})</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card card-metric p-3 text-center">
+    <div class="fs-1 fw-bold">{{ total }}</div><div class="text-muted">Total Payments</div></div></div>
+  <div class="col-md-3"><div class="card card-metric p-3 text-center">
+    <div class="fs-1 fw-bold text-danger">{{ flagged }}</div><div class="text-muted">Fraud-Flagged</div></div></div>
+  <div class="col-md-3"><div class="card card-metric p-3 text-center">
+    <div class="fs-1 fw-bold text-success">{{ approved }}</div><div class="text-muted">Approved</div></div></div>
+  <div class="col-md-3"><div class="card card-metric p-3 text-center">
+    <div class="fs-1 fw-bold text-warning">{{ sod_violations }}</div><div class="text-muted">SoD Violations Blocked</div></div></div>
+</div>
+
+{% if high_risk_payments %}
+<h4>⚠ High-Risk Transactions</h4>
+<table class="table table-bordered bg-white mb-4">
+  <thead><tr><th>ID</th><th>Beneficiary</th><th>Amount</th><th>Status</th><th>Reasons</th></tr></thead>
+  <tbody>
+  {% for p in high_risk_payments %}
+    <tr class="risk-HIGH">
+      <td>{{ p.id }}</td><td>{{ p.beneficiary_name }} ({{ p.beneficiary_country }})</td>
+      <td>SAR {{ "%.0f"|format(p.amount) }}</td><td>{{ p.status }}</td><td>{{ p.risk_reasons }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h4>Recent Audit Activity</h4>
+<table class="table table-sm table-bordered bg-white">
+  <thead><tr><th>Time (UTC)</th><th>Actor</th><th>Action</th><th>Details</th></tr></thead>
+  <tbody>
+  {% for l in recent_logs %}
+    <tr>
+      <td>{{ l.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{ l.actor }}</td>
+      <td>{% if 'BLOCKED' in l.action or 'FLAGGED' in l.action %}<span class="badge bg-danger">{{ l.action }}</span>{% else %}{{ l.action }}{% endif %}</td>
+      <td>{{ l.details }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<a href="{{ url_for('audit') }}">View full audit log →</a>
+{% endblock %}

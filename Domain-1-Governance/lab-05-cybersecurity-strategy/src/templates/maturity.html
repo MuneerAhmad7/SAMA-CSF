@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Maturity Assessment</h1>
+<p class="subtitle">SAMA CSF maturity model (0 Non-existent → 5 Adaptive). Blue bar = current level, red marker = target level.</p>
+
+<div class="card">
+  {% for s in scores %}
+  <div class="maturity-row">
+    <div class="maturity-label">{{ s.domain }}</div>
+    <div class="maturity-track">
+      <div class="maturity-current" style="width: {{ (s.current_level / 5 * 100) }}%;"></div>
+      <div class="maturity-target-marker" style="left: {{ (s.target_level / 5 * 100) }}%;"></div>
+    </div>
+    <div class="maturity-levels">{{ s.current_level }} / {{ s.target_level }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<h2>Update Scores</h2>
+<table>
+  <thead><tr><th>Domain</th><th>Current (0-5)</th><th>Target (0-5)</th><th>Notes</th><th></th></tr></thead>
+  <tbody>
+  {% for s in scores %}
+    <tr>
+      <form method="post">
+      <td>{{ s.domain }}</td>
+      <td style="width:80px">
+        <input type="hidden" name="score_id" value="{{ s.id }}">
+        <select name="current_level">{% for lvl in range(6) %}<option value="{{ lvl }}" {% if lvl == s.current_level %}selected{% endif %}>{{ lvl }}</option>{% endfor %}</select>
+      </td>
+      <td style="width:80px">
+        <select name="target_level">{% for lvl in range(6) %}<option value="{{ lvl }}" {% if lvl == s.target_level %}selected{% endif %}>{{ lvl }}</option>{% endfor %}</select>
+      </td>
+      <td><input name="notes" value="{{ s.notes or '' }}" placeholder="rationale / evidence" style="width:260px"></td>
+      <td><button class="btn small">Save</button></td>
+      </form>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

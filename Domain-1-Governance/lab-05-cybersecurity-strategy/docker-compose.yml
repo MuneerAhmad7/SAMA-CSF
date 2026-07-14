@@ -1,0 +1,11 @@
+services:
+  strategy-tracker:
+    build: ./src
+    container_name: strategy-tracker-lab05
+    ports:
+      - "5004:5004"
+    volumes:
+      - strategy_data:/app/instance
+
+volumes:
+  strategy_data:

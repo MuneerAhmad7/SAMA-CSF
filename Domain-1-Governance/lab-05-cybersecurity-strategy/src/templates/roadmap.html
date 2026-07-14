@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Strategic Roadmap</h1>
+<p class="subtitle">Phased initiatives: Foundation → Core Controls → Advanced Controls → Optimization</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Initiative</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Title</label><input name="title" required style="min-width:220px"></div>
+    <div class="field"><label>Phase</label>
+      <select name="phase">{% for p in phases %}<option>{{ p }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Domain</label>
+      <select name="domain">{% for d in domains %}<option>{{ d }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <div class="field"><label>Budget Allocated (SAR)</label><input type="number" step="1000" name="budget_allocated"></div>
+    <div class="field"><label>Budget Spent (SAR)</label><input type="number" step="1000" name="budget_spent"></div>
+    <div class="field"><label>Status</label>
+      <select name="status">{% for s in statuses %}<option>{{ s }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Target Quarter</label><input name="target_quarter" placeholder="Q3 2026"></div>
+    <button class="btn">Add Initiative</button>
+  </form>
+</div>
+
+{% for phase in phases %}
+<h2><span class="phase-badge {{ phase|replace(' ', '-') }}">{{ phase }}</span></h2>
+<table>
+  <thead><tr><th>Initiative</th><th>Domain</th><th>Owner</th><th>Budget</th><th>Status</th><th>Target</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for i in initiatives if i.phase == phase %}
+    <tr>
+      <td>{{ i.title }}</td>
+      <td>{{ i.domain }}</td>
+      <td>{{ i.owner }}</td>
+      <td>SAR {{ "%.0f"|format(i.budget_spent or 0) }} / {{ "%.0f"|format(i.budget_allocated or 0) }}</td>
+      <td><span class="status-pill {{ i.status|replace(' ', '-') }}">{{ i.status }}</span></td>
+      <td>{{ i.target_quarter }}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_initiative', initiative_id=i.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == i.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <input type="number" step="1000" name="budget_spent" value="{{ i.budget_spent or 0 }}" style="width:100px">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" style="color:var(--text-muted)">No initiatives in this phase yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+{% endblock %}

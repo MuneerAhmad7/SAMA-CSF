@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Authority & Independence Assessment</h1>
+<p class="subtitle">14 controls modeled directly on Target's 2013 governance gaps — SAMA CSF 1.1/1.2, NCA ECC 1‑2</p>
+
+<table>
+  <thead><tr><th>Control</th><th>Description</th><th>Status</th><th>Evidence</th><th></th></tr></thead>
+  <tbody>
+  {% for c in controls %}
+    <tr>
+      <form method="post">
+      <td>{{ c.control_id }}</td>
+      <td>{{ c.description }}</td>
+      <td style="min-width:160px">
+        <input type="hidden" name="control_id" value="{{ c.id }}">
+        <select class="form-select" name="status">
+          {% for s in ["Not Implemented", "Partial", "Implemented"] %}
+            <option {% if c.status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </td>
+      <td><input name="evidence" value="{{ c.evidence or '' }}" placeholder="e.g. Charter v1.2, section 3" style="width:220px"></td>
+      <td><button class="btn small">Save</button></td>
+      </form>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

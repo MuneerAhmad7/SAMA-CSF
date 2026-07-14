@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Payments</h2>
+
+{% if user.role == 'Maker' %}
+<div class="card p-3 mb-4 shadow-sm">
+  <h5>Create New Payment</h5>
+  <form method="post" class="row g-2">
+    <div class="col-md-3"><input class="form-control" name="beneficiary_name" placeholder="Beneficiary name" required></div>
+    <div class="col-md-3"><input class="form-control" name="beneficiary_account" placeholder="Beneficiary account #" required></div>
+    <div class="col-md-2"><input class="form-control" name="beneficiary_country" placeholder="Country" required></div>
+    <div class="col-md-2"><input class="form-control" type="number" step="0.01" name="amount" placeholder="Amount (SAR)" required></div>
+    <div class="col-md-2 form-check mt-2">
+      <input class="form-check-input" type="checkbox" name="simulate_off_hours" id="offhours">
+      <label class="form-check-label" for="offhours">Simulate off-hours (2:15 AM)</label>
+    </div>
+    <div class="col-12"><button class="btn btn-primary">Submit Payment</button></div>
+  </form>
+  <p class="small text-muted mt-2">Tip: try amount ≥ 1,000,000 to a beneficiary you haven't used before — the fraud engine will flag it, replaying the exact pattern from the Bangladesh Bank heist.</p>
+</div>
+{% endif %}
+
+<table class="table table-bordered bg-white">
+  <thead><tr><th>ID</th><th>Maker</th><th>Beneficiary</th><th>Amount</th><th>Risk</th><th>Reasons</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for p in payments %}
+    <tr class="risk-{{ p.risk_level }}">
+      <td>{{ p.id }}</td>
+      <td>{{ p.maker_id }}</td>
+      <td>{{ p.beneficiary_name }} ({{ p.beneficiary_country }})<br><small class="text-muted">{{ p.beneficiary_account }}</small></td>
+      <td>SAR {{ "%.0f"|format(p.amount) }}</td>
+      <td><strong>{{ p.risk_level or "—" }}</strong></td>
+      <td><small>{{ p.risk_reasons or "—" }}</small></td>
+      <td>{{ p.status }}</td>
+      <td>
+        {% if user.role == 'Checker' and p.status == 'Pending' %}
+          <form method="post" action="{{ url_for('approve_payment', payment_id=p.id) }}" class="d-inline">
+            <input type="hidden" name="note" value="Approved after review">
+            <button class="btn btn-sm btn-success">Approve</button>
+          </form>
+          <form method="post" action="{{ url_for('reject_payment', payment_id=p.id) }}" class="d-inline">
+            <input type="hidden" name="note" value="Rejected — see fraud flags">
+            <button class="btn btn-sm btn-danger">Reject</button>
+          </form>
+        {% else %}
+          {{ p.decision_note or "" }}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

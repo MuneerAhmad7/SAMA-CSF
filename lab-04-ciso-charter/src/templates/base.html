@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Falak Pay — CISO Charter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="sidebar no-print">
+  <div class="brand">🛡 Falak Pay
+    <small>CISO Charter — Lab 04</small>
+  </div>
+  <nav>
+    <a href="{{ url_for('dashboard') }}">📊 Dashboard</a>
+    <a href="{{ url_for('charter') }}">📄 Charter Builder</a>
+    <a href="{{ url_for('authority') }}">⚖ Authority Assessment</a>
+    <a href="{{ url_for('raci') }}">🧩 RACI</a>
+    <a href="{{ url_for('escalation') }}">🚨 Escalation Matrix</a>
+    <a href="{{ url_for('audit') }}">📜 Audit Log</a>
+    <a href="{{ url_for('report') }}">🖨 Printable Charter</a>
+  </nav>
+</div>
+<div class="main">
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}<div class="flash">{{ messages[0] }}</div>{% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

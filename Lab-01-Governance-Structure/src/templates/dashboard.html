@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">SAMA CSF / NCA ECC — Domain 1 Governance Dashboard</h2>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card card-metric p-3 text-center">
+      <div class="fs-1 fw-bold text-primary">{{ compliance_pct }}%</div>
+      <div class="text-muted">Domain 1 Compliance</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-metric p-3 text-center">
+      <div class="fs-1 fw-bold">{{ implemented }}/{{ total }}</div>
+      <div class="text-muted">Controls Implemented</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-metric p-3 text-center">
+      <div class="fs-1 fw-bold">{{ policies_count }}</div>
+      <div class="text-muted">Policies Tracked</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-metric p-3 text-center">
+      <div class="fs-1 fw-bold {% if overdue_policies > 0 %}text-danger{% endif %}">{{ overdue_policies }}</div>
+      <div class="text-muted">Overdue Policy Reviews</div>
+    </div>
+  </div>
+</div>
+
+<h4>KPI / KRI Snapshot</h4>
+<table class="table table-bordered bg-white">
+  <thead><tr><th>Metric</th><th>Target</th><th>Actual</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for m in metrics %}
+    <tr class="{% if m.status=='Green' %}rag-green{% elif m.status=='Amber' %}rag-amber{% else %}rag-red{% endif %}">
+      <td>{{ m.name }}</td><td>{{ m.target }}</td><td>{{ m.actual }}</td><td>{{ m.status }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4" class="text-muted">No metrics yet — add some under KPI/KRI.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<p class="text-muted">Committee meetings logged: {{ meetings_count }}</p>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>CISO Charter Dashboard</h1>
+<p class="subtitle">{{ org_name }} — CISO: {{ ciso_name }}</p>
+
+<div class="metric-grid">
+  <div class="metric-card">
+    <div class="value">{{ completeness_pct }}%</div>
+    <div class="label">Charter Completeness ({{ filled }}/{{ total_fields }} fields)</div>
+    <div class="progress-track"><div class="progress-fill {% if completeness_pct >= 90 %}good{% elif completeness_pct >= 50 %}warn{% else %}bad{% endif %}" style="width:{{ completeness_pct }}%"></div></div>
+  </div>
+  <div class="metric-card">
+    <div class="value">{{ authority_pct }}%</div>
+    <div class="label">Authority & Independence Maturity ({{ implemented }}/{{ total_controls }} met)</div>
+    <div class="progress-track"><div class="progress-fill {% if authority_pct >= 90 %}good{% elif authority_pct >= 50 %}warn{% else %}bad{% endif %}" style="width:{{ authority_pct }}%"></div></div>
+  </div>
+  <div class="metric-card"><div class="value">{{ raci_count }}</div><div class="label">RACI Entries Defined</div></div>
+  <div class="metric-card"><div class="value">{{ escalation_count }}</div><div class="label">Escalation Rules Defined</div></div>
+</div>
+
+{% if gaps %}
+<h2>Open Authority Gaps</h2>
+<p class="subtitle">Each of these mirrors a specific structural gap identified in Target's 2013 breach — see <code>docs/case-study-target-breach.md</code>.</p>
+<table>
+  <thead><tr><th>Control</th><th>Description</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for g in gaps %}
+    <tr>
+      <td>{{ g.control_id }}</td>
+      <td>{{ g.description }}</td>
+      <td><span class="status-pill {{ g.status|replace(' ', '-') }}">{{ g.status }}</span></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="card"><strong>✅ All authority & independence controls are fully implemented.</strong></div>
+{% endif %}
+{% endblock %}

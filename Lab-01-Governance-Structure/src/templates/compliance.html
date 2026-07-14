@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Domain 1 Compliance Checklist (SAMA CSF + NCA ECC)</h2>
+<table class="table table-bordered bg-white align-middle">
+  <thead><tr><th>Framework</th><th>Control</th><th>Description</th><th>Status</th><th>Evidence</th><th></th></tr></thead>
+  <tbody>
+  {% for c in controls %}
+    <tr class="{% if c.status=='Implemented' %}rag-green{% elif c.status=='Partial' %}rag-amber{% else %}rag-red{% endif %}">
+      <form method="post">
+      <td>{{ c.framework }}</td>
+      <td>{{ c.control_id }}</td>
+      <td>{{ c.description }}</td>
+      <td style="min-width:160px">
+        <input type="hidden" name="control_id" value="{{ c.id }}">
+        <select class="form-select form-select-sm" name="status">
+          <option {% if c.status=='Not Implemented' %}selected{% endif %}>Not Implemented</option>
+          <option {% if c.status=='Partial' %}selected{% endif %}>Partial</option>
+          <option {% if c.status=='Implemented' %}selected{% endif %}>Implemented</option>
+        </select>
+      </td>
+      <td><input class="form-control form-control-sm" name="evidence" value="{{ c.evidence or '' }}" placeholder="e.g. policy v1.2 approved 2026-07-01"></td>
+      <td><button class="btn btn-sm btn-outline-primary">Save</button></td>
+      </form>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

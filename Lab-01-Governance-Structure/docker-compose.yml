@@ -1,0 +1,11 @@
+services:
+  governance-tracker:
+    build: ./src
+    container_name: governance-tracker
+    ports:
+      - "5000:5000"
+    volumes:
+      - governance_data:/app/instance
+
+volumes:
+  governance_data:

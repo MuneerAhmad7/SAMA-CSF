@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>RACI Matrix</h2>
+<form method="post" class="row g-2 bg-white p-3 rounded mb-4 shadow-sm">
+  <div class="col-md-4"><input class="form-control" name="activity" placeholder="Activity" required></div>
+  <div class="col-md-2"><input class="form-control" name="responsible" placeholder="Responsible"></div>
+  <div class="col-md-2"><input class="form-control" name="accountable" placeholder="Accountable"></div>
+  <div class="col-md-2"><input class="form-control" name="consulted" placeholder="Consulted"></div>
+  <div class="col-md-1"><input class="form-control" name="informed" placeholder="Informed"></div>
+  <div class="col-md-1"><button class="btn btn-primary w-100">Add</button></div>
+</form>
+
+<table class="table table-bordered bg-white">
+  <thead><tr><th>Activity</th><th>R</th><th>A</th><th>C</th><th>I</th></tr></thead>
+  <tbody>
+  {% for e in entries %}
+    <tr>
+      <td>{{ e.activity }}</td><td>{{ e.responsible }}</td><td>{{ e.accountable }}</td>
+      <td>{{ e.consulted }}</td><td>{{ e.informed }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

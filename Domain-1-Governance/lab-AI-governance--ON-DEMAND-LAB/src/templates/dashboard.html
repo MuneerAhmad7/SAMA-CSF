@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>AI Governance Dashboard</h1>
+<p class="subtitle">Evidence for a non-deterministic system: sampled, weighted, trended — not a single checkbox.</p>
+
+<div class="card">
+  <div class="accuracy-gauge">
+    <div class="accuracy-circle {% if overall_accuracy is none %}none{% elif overall_accuracy >= 90 %}good{% elif overall_accuracy >= 75 %}warn{% else %}bad{% endif %}">
+      {% if overall_accuracy is none %}No data{% else %}{{ overall_accuracy }}%{% endif %}
+    </div>
+    <div>
+      <h2 style="margin:0;">Weighted Sample Accuracy — All AI Systems</h2>
+      <p class="subtitle" style="margin:4px 0 0;">Computed from every logged output sample review across all systems. This rolling rate is the Board-level evidence for systems that can't be exhaustively tested.</p>
+      {% if overall_escalation is not none %}<p class="subtitle" style="margin:2px 0 0;">Escalation-needed rate across all samples: <strong>{{ overall_escalation }}%</strong></p>{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ system_count }}</div><div class="label">AI Systems Tracked</div></div>
+  <div class="metric-card {% if open_incidents|length > 0 %}danger{% endif %}"><div class="value">{{ open_incidents|length }}</div><div class="label">Open AI Incidents</div></div>
+  <div class="metric-card {% if unenforced_checkpoints|length > 0 %}danger{% endif %}"><div class="value">{{ unenforced_checkpoints|length }}</div><div class="label">Unenforced Oversight Checkpoints</div></div>
+  <div class="metric-card {% if pending_changes|length > 0 %}danger{% endif %}"><div class="value">{{ pending_changes|length }}</div><div class="label">Model Changes Pending Approval</div></div>
+</div>
+
+{% if unenforced_checkpoints %}
+<div class="alert-banner">
+  <strong>⚠ {{ unenforced_checkpoints|length }} oversight checkpoint(s) documented but not enforced</strong>
+  This is the exact gap behind the Air Canada chatbot ruling — a human-review trigger that exists on paper but isn't actually active. See Oversight Checkpoints.
+</div>
+{% endif %}
+
+<h2>Accuracy by System</h2>
+<table>
+  <thead><tr><th>System</th><th>Risk Tier</th><th>Sampled Outputs</th><th>Accuracy</th></tr></thead>
+  <tbody>
+  {% for item in system_accuracy %}
+    <tr class="{% if item.accuracy is not none and item.accuracy < 85 %}risk-HIGH{% endif %}">
+      <td><a href="{{ url_for('system_detail', system_id=item.system.id) }}">{{ item.system.name }}</a></td>
+      <td><span class="badge {{ item.system.risk_tier }}">{{ item.system.risk_tier }}</span></td>
+      <td>{{ item.sample_count }}</td>
+      <td><strong>{{ item.accuracy if item.accuracy is not none else "No samples yet" }}{{ "%" if item.accuracy is not none }}</strong></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if open_incidents %}
+<h2>Open AI Incidents</h2>
+<table>
+  <thead><tr><th>System</th><th>Date</th><th>Severity</th><th>Description</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for i in open_incidents %}
+    <tr><td>{{ i.ai_system.name if i.ai_system else "—" }}</td><td>{{ i.incident_date }}</td>
+    <td><span class="badge {{ i.severity }}">{{ i.severity }}</span></td><td>{{ i.description }}</td>
+    <td><span class="status-pill {{ i.status }}">{{ i.status }}</span></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

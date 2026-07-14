@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Model Change Log</h1>
+<p class="subtitle">Every model version upgrade, prompt change, or guardrail update — gated through approval before reaching production. The AI-specific equivalent of a Deploy gate.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log Model Change</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>AI System</label>
+      <select name="ai_system_id">{% for s in systems %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" name="change_date"></div>
+    <div class="field"><label>Type</label>
+      <select name="change_type">{% for t in change_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Description</label><input name="description" required style="min-width:260px"></div>
+    <button class="btn">Log Change</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>System</th><th>Date</th><th>Type</th><th>Description</th><th>Status</th><th>Approver</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for c in changes %}
+    <tr class="{% if c.status == 'Pending' %}risk-HIGH{% endif %}">
+      <td>{{ c.ai_system.name if c.ai_system else "—" }}</td>
+      <td>{{ c.change_date }}</td>
+      <td>{{ c.change_type }}</td>
+      <td>{{ c.description }}</td>
+      <td><span class="status-pill {{ c.status }}">{{ c.status }}</span></td>
+      <td>{{ c.approver or "—" }}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_change', change_id=c.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            <option {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option {% if c.status == 'Approved' %}selected{% endif %}>Approved</option>
+            <option {% if c.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+          </select>
+          <input name="approver" placeholder="approver" value="{{ c.approver or '' }}" style="width:140px">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

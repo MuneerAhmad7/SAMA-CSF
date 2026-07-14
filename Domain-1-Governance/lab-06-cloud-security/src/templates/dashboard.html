@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Cloud Security Posture Dashboard</h1>
+<p class="subtitle">SAMA CSF 4.3 / NCA ECC 4‑2 — weighted score: 100 minus penalty per open finding by severity</p>
+
+<div class="card">
+  <div class="score-gauge">
+    <div class="score-circle {% if score >= 80 %}good{% elif score >= 50 %}warn{% else %}bad{% endif %}">{{ score }}</div>
+    <div>
+      <h2 style="margin:0;">Cloud Security Posture Score</h2>
+      <p class="subtitle" style="margin:4px 0 0;">{{ open_count }} open finding{{ 's' if open_count != 1 }} out of {{ total_findings }} total, across {{ resource_count }} tracked cloud resources ({{ prod_resource_count }} in Production).</p>
+    </div>
+  </div>
+</div>
+
+<div class="metric-grid">
+  <div class="metric-card {% if critical_open|length > 0 %}danger{% endif %}"><div class="value">{{ critical_open|length }}</div><div class="label">Open Critical Findings</div></div>
+  <div class="metric-card {% if prod_findings_count > 0 %}danger{% endif %}"><div class="value">{{ prod_findings_count }}</div><div class="label">Open Findings in Production</div></div>
+  <div class="metric-card"><div class="value">{{ resource_count }}</div><div class="label">Cloud Resources Tracked</div></div>
+  <div class="metric-card"><div class="value">{{ total_findings }}</div><div class="label">Total Findings (All Time)</div></div>
+</div>
+
+{% if critical_open %}
+<div class="alert-banner">
+  <strong>⚠ {{ critical_open|length }} unresolved Critical finding(s)</strong>
+  This is the exact risk category behind the Capital One breach — an over-permissioned IAM role or misconfigured public-facing control left unresolved. See Findings for detail.
+</div>
+{% endif %}
+
+<h2>Findings by Severity</h2>
+<table>
+  <thead><tr><th>Severity</th><th>Total</th><th>Currently Open</th></tr></thead>
+  <tbody>
+  {% for s in ["Critical","High","Medium","Low"] %}
+    <tr><td><span class="badge {{ s }}">{{ s }}</span></td><td>{{ severity_counts[s] }}</td><td>{{ open_by_severity[s] }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if critical_open %}
+<h2>Open Critical Findings — Immediate Attention Required</h2>
+<table>
+  <thead><tr><th>Rule</th><th>Title</th><th>Resource</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for f in critical_open %}
+    <tr><td><span class="rule-chip">{{ f.rule_id }}</span></td><td>{{ f.title }}</td>
+    <td>{{ f.resource.name if f.resource else "—" }}</td><td><span class="status-pill {{ f.status }}">{{ f.status }}</span></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

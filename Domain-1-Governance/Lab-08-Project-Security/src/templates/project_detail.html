@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ project.name }}</h1>
+<p class="subtitle">{{ project.project_type }} · {{ project.business_unit or "—" }} · Criticality: {{ project.criticality }} · Owner: {{ project.owner or "—" }}</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Security Gate Pipeline — {{ compliance }}% Passed</h2>
+  <div class="gate-pipeline">
+    {% for g in gates %}
+    <div class="gate-step {{ g.status|replace(' ', '-') }}">
+      <div class="gate-title">{{ g.gate_name }}</div>
+      <div class="gate-status">{{ g.status }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% for g in gates %}
+<div class="card">
+  <h3 style="margin-top:0;">{{ g.gate_name }} <span class="status-pill {{ g.status|replace(' ', '-') }}">{{ g.status }}</span></h3>
+  {% if g.evidence_notes %}<p style="font-size:0.88rem; color:var(--text-muted);"><strong>Evidence:</strong> {{ g.evidence_notes }}</p>{% endif %}
+  <p style="font-size:0.85rem; color:var(--text-muted);">Approver: {{ g.approver or "—" }} · Date: {{ g.gate_date or "—" }}</p>
+  <form method="post" action="{{ url_for('update_gate', gate_id=g.id) }}" class="inline-form no-print">
+    <select name="status" style="padding:6px">
+      {% for s in gate_statuses %}<option {% if s == g.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select>
+    <input name="approver" placeholder="Approver name" value="{{ g.approver or '' }}" style="width:160px">
+    <input type="date" name="gate_date" value="{{ g.gate_date or '' }}">
+    <input name="evidence_notes" placeholder="Evidence / notes" style="min-width:220px">
+    <button class="btn small">Save</button>
+  </form>
+</div>
+{% endfor %}
+
+<a href="{{ url_for('projects') }}" class="no-print">← Back to Project Register</a>
+{% endblock %}

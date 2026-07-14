@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Coverage Gap Analysis</h1>
+<p class="subtitle">Every required control domain, checked against the Policy Register — this is the analysis that should have run immediately after the Starwood acquisition closed.</p>
+
+{% for domain, info in coverage_map.items() %}
+  <div class="gap-card {% if info.covered %}covered{% else %}missing{% endif %}">
+    <div>
+      <strong>{{ domain }}</strong><br>
+      {% if info.policies %}
+        <span style="font-size:0.85rem;">{{ info.policies|map(attribute='title')|join(', ') }}</span>
+      {% else %}
+        <span style="font-size:0.85rem;">No policy exists for this domain at all.</span>
+      {% endif %}
+    </div>
+    <div>
+      {% if info.covered %}
+        <span class="status-pill Published">COVERED</span>
+        {% if info.overdue %}<span class="status-pill Draft" style="margin-left:6px;">Review Overdue</span>{% endif %}
+      {% else %}
+        <span class="status-pill Retired" style="background:var(--breach-bg); color:var(--critical);">GAP — NO ACTIVE POLICY</span>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Change Log</h1>
+<p class="subtitle">Every production deployment, flagged if it went live without a passed Deploy gate.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log Change</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Title</label><input name="title" required style="min-width:220px"></div>
+    <div class="field"><label>Project (optional)</label>
+      <select name="project_id"><option value="">— none —</option>{% for p in projects %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Change Type</label><input name="change_type" placeholder="e.g. Code deploy, config change"></div>
+    <div class="field"><label>Deployed Date</label><input type="date" name="deployed_at"></div>
+    <div class="field"><label>Approver</label><input name="approver"></div>
+    <div class="field" style="flex-direction:row; align-items:center; gap:6px;">
+      <input type="checkbox" name="gate_passed" id="gp_new" checked style="width:auto;"> <label for="gp_new" style="margin:0;">Deploy gate was passed before this change</label>
+    </div>
+    <div class="field"><label>Notes</label><input name="notes" style="min-width:200px"></div>
+    <button class="btn">Log Change</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Title</th><th>Project</th><th>Type</th><th>Deployed</th><th>Deploy Gate Passed?</th><th>Approver</th></tr></thead>
+  <tbody>
+  {% for c in changes %}
+    <tr class="{% if not c.gate_passed %}risk-HIGH{% endif %}">
+      <td>{{ c.title }}{% if c.notes %}<br><small style="color:var(--text-muted)">{{ c.notes }}</small>{% endif %}</td>
+      <td>{{ c.project.name if c.project else "—" }}</td>
+      <td>{{ c.change_type or "—" }}</td>
+      <td>{{ c.deployed_at or "—" }}</td>
+      <td>{% if c.gate_passed %}<span class="sri-yes">✓ Yes</span>{% else %}<span class="sri-no">✗ NO — UNGATED CHANGE</span>{% endif %}</td>
+      <td>{{ c.approver or "—" }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

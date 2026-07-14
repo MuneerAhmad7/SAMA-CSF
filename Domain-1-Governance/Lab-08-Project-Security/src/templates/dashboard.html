@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Project Security Dashboard</h1>
+<p class="subtitle">SAMA CSF 1.5 / NCA ECC 1‑6 — security gates across the project delivery lifecycle</p>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ project_count }}</div><div class="label">Active/Tracked Projects</div></div>
+  <div class="metric-card {% if overall_compliance < 80 %}danger{% endif %}"><div class="value">{{ overall_compliance }}%</div><div class="label">Overall Gate Compliance ({{ passed_gates }}/{{ total_gates }} Passed)</div></div>
+  <div class="metric-card {% if ungated_changes|length > 0 %}danger{% endif %}"><div class="value">{{ ungated_changes|length }}</div><div class="label">Changes Deployed Without a Passed Deploy Gate</div></div>
+  <div class="metric-card {% if sensitive_unprotected|length > 0 %}danger{% endif %}"><div class="value">{{ sensitive_unprotected|length }}</div><div class="label">High/Critical Scripts Without SRI Protection</div></div>
+</div>
+
+{% if ungated_changes %}
+<div class="alert-banner">
+  <strong>⚠ {{ ungated_changes|length }} change(s) deployed without a passed Deploy gate</strong>
+  This is the exact failure mode behind the British Airways 2018 breach — a change reaching production without security sign-off. See Change Log for detail.
+</div>
+{% endif %}
+
+{% if sensitive_unprotected %}
+<div class="alert-banner">
+  <strong>⚠ {{ sensitive_unprotected|length }} sensitive third-party script(s) with no integrity protection</strong>
+  A script without a pinned SRI hash on a high-risk page can be silently altered without detection — see Third-Party Scripts.
+</div>
+{% endif %}
+
+{% if failed_or_waived %}
+<h2>Failed or Waived Gates</h2>
+<table>
+  <thead><tr><th>Project</th><th>Gate</th><th>Status</th><th>Approver</th></tr></thead>
+  <tbody>
+  {% for g in failed_or_waived %}
+    <tr><td>{{ g.project.name }}</td><td>{{ g.gate_name }}</td>
+    <td><span class="status-pill {{ g.status|replace(' ', '-') }}">{{ g.status }}</span></td><td>{{ g.approver or "—" }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h2>Lowest Gate Compliance (top priority projects)</h2>
+<table>
+  <thead><tr><th>Project</th><th>Gate Compliance</th></tr></thead>
+  <tbody>
+  {% for p, pct in lowest_compliance %}
+    <tr><td><a href="{{ url_for('project_detail', project_id=p.id) }}">{{ p.name }}</a></td><td><strong>{{ pct }}%</strong></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

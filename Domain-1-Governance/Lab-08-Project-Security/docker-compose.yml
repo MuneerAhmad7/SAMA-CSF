@@ -1,0 +1,11 @@
+services:
+  project-security:
+    build: ./src
+    container_name: project-security-lab08
+    ports:
+      - "5007:5007"
+    volumes:
+      - projectsecurity_data:/app/instance
+
+volumes:
+  projectsecurity_data:

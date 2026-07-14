@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ system.name }}</h1>
+<p class="subtitle">{{ system.system_type }} · Owner: {{ system.owner or "—" }} · Version: {{ system.model_version or "—" }} · <span class="badge {{ system.risk_tier }}">{{ system.risk_tier }}</span></p>
+{% if system.description %}<p class="subtitle">{{ system.description }}</p>{% endif %}
+
+<div class="card">
+  <div class="accuracy-gauge">
+    <div class="accuracy-circle {% if accuracy is none %}none{% elif accuracy >= 90 %}good{% elif accuracy >= 75 %}warn{% else %}bad{% endif %}">
+      {% if accuracy is none %}No data{% else %}{{ accuracy }}%{% endif %}
+    </div>
+    <div>
+      <h2 style="margin:0;">Sampled Output Accuracy</h2>
+      <p class="subtitle" style="margin:4px 0 0;">Based on {{ system.samples|length }} review batch(es). {% if escalation is not none %}Escalation-needed rate: {{ escalation }}%{% endif %}</p>
+    </div>
+  </div>
+</div>
+
+<h2>Oversight Checkpoints</h2>
+<table>
+  <thead><tr><th>Checkpoint</th><th>Trigger</th><th>Enforced?</th></tr></thead>
+  <tbody>
+  {% for c in system.checkpoints %}
+    <tr class="{% if not c.enforced %}risk-HIGH{% endif %}">
+      <td>{{ c.checkpoint_name }}</td><td>{{ c.trigger_condition }}</td>
+      <td>{% if c.enforced %}<span class="enforced-yes">✓ Enforced</span>{% else %}<span class="enforced-no">✗ Not Enforced</span>{% endif %}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3" style="color:var(--text-muted)">No checkpoints defined yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Recent Sample Reviews</h2>
+<table>
+  <thead><tr><th>Date</th><th>Size</th><th>Accurate</th><th>Inaccurate</th><th>Escalation Needed</th><th>Reviewer</th></tr></thead>
+  <tbody>
+  {% for s in system.samples %}
+    <tr><td>{{ s.sample_date }}</td><td>{{ s.sample_size }}</td><td>{{ s.accurate_count }}</td>
+    <td>{{ s.inaccurate_count }}</td><td>{{ s.escalation_needed_count }}</td><td>{{ s.reviewer or "—" }}</td></tr>
+  {% else %}
+    <tr><td colspan="6" style="color:var(--text-muted)">No sample reviews logged yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Incidents</h2>
+<table>
+  <thead><tr><th>Date</th><th>Severity</th><th>Description</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for i in system.incidents %}
+    <tr><td>{{ i.incident_date }}</td><td><span class="badge {{ i.severity }}">{{ i.severity }}</span></td>
+    <td>{{ i.description }}</td><td><span class="status-pill {{ i.status }}">{{ i.status }}</span></td></tr>
+  {% else %}
+    <tr><td colspan="4" style="color:var(--text-muted)">No incidents logged.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<a href="{{ url_for('systems') }}" class="no-print">← Back to AI System Inventory</a>
+{% endblock %}

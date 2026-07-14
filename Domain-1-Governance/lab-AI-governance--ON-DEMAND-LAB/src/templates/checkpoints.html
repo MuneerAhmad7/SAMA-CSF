@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Human Oversight Checkpoints</h1>
+<p class="subtitle">Named, per-system triggers where the AI must hand off to a human — and whether that's actually enforced in production, not just documented.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Checkpoint</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>AI System</label>
+      <select name="ai_system_id">{% for s in systems %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Checkpoint Name</label><input name="checkpoint_name" required style="min-width:200px"></div>
+    <div class="field"><label>Trigger Condition</label><input name="trigger_condition" style="min-width:260px" placeholder="e.g. Any refund or policy exception mentioned"></div>
+    <div class="field" style="flex-direction:row; align-items:center; gap:6px;">
+      <input type="checkbox" name="enforced" id="enf_new" style="width:auto;"> <label for="enf_new" style="margin:0;">Enforced in production</label>
+    </div>
+    <button class="btn">Add Checkpoint</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>System</th><th>Checkpoint</th><th>Trigger</th><th>Enforced?</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for c in checkpoints %}
+    <tr class="{% if not c.enforced %}risk-HIGH{% endif %}">
+      <td>{{ c.ai_system.name if c.ai_system else "—" }}</td>
+      <td>{{ c.checkpoint_name }}</td>
+      <td>{{ c.trigger_condition }}</td>
+      <td>{% if c.enforced %}<span class="enforced-yes">✓ Enforced</span>{% else %}<span class="enforced-no">✗ Not Enforced</span>{% endif %}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_checkpoint', checkpoint_id=c.id) }}" class="inline-form no-print">
+          <input type="checkbox" name="enforced" {% if c.enforced %}checked{% endif %} style="width:auto;">
+          <input name="notes" placeholder="note" value="{{ c.notes or '' }}" style="width:160px">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+    {% if c.notes %}<tr><td colspan="5"><small style="color:var(--text-muted)">{{ c.notes }}</small></td></tr>{% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

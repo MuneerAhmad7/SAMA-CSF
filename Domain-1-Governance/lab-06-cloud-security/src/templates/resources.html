@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Cloud Resource Inventory</h1>
+<p class="subtitle">Every finding must trace back to a tracked resource — no invisible infrastructure.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Resource</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Name</label><input name="name" required placeholder="e.g. customer-data-prod" style="min-width:200px"></div>
+    <div class="field"><label>Type</label>
+      <select name="resource_type">{% for t in resource_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Environment</label>
+      <select name="environment">{% for e in environments %}<option>{{ e }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Sensitivity</label>
+      <select name="sensitivity">{% for s in severities %}<option>{{ s }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <div class="field"><label>Identifier / ARN</label><input name="identifier" placeholder="arn:aws:..." style="min-width:200px"></div>
+    <button class="btn">Add Resource</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Environment</th><th>Sensitivity</th><th>Owner</th><th>Open Findings</th></tr></thead>
+  <tbody>
+  {% for r in resources %}
+    <tr class="{% if finding_counts.get(r.id, 0) > 0 %}risk-HIGH{% endif %}">
+      <td>{{ r.name }}<br><small style="color:var(--text-muted)">{{ r.identifier or "" }}</small></td>
+      <td>{{ r.resource_type }}</td>
+      <td><span class="resource-tag {{ r.environment }}">{{ r.environment }}</span></td>
+      <td><span class="badge {{ r.sensitivity }}">{{ r.sensitivity }}</span></td>
+      <td>{{ r.owner or "—" }}</td>
+      <td><strong>{{ finding_counts.get(r.id, 0) }}</strong></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

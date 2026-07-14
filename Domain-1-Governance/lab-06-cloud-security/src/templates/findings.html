@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Misconfiguration Findings Register</h1>
+<p class="subtitle">10 CSPM rules modeled on real cloud security failure patterns, including the exact Capital One IAM/WAF pattern.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log New Finding</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Rule</label>
+      <select name="rule_id" id="rule_select" onchange="autofill()">
+        {% for rid, title, sev in rules %}<option value="{{ rid }}" data-title="{{ title }}" data-sev="{{ sev }}">{{ rid }} — {{ title }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Title</label><input name="title" id="title_input" required style="min-width:220px"></div>
+    <div class="field"><label>Severity</label>
+      <select name="severity" id="severity_select">{% for s in severities %}<option>{{ s }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Resource</label>
+      <select name="resource_id">{% for r in resources %}<option value="{{ r.id }}">{{ r.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <div class="field"><label>Description</label><input name="description" style="min-width:220px"></div>
+    <button class="btn">Log Finding</button>
+  </form>
+</div>
+<script>
+function autofill() {
+  var sel = document.getElementById('rule_select');
+  var opt = sel.options[sel.selectedIndex];
+  document.getElementById('title_input').value = opt.getAttribute('data-title');
+  document.getElementById('severity_select').value = opt.getAttribute('data-sev');
+}
+</script>
+
+<div class="filters no-print">
+  <a href="{{ url_for('findings') }}" class="{{ 'active' if not severity_filter and not status_filter }}">All</a>
+  {% for s in severities %}<a href="{{ url_for('findings', severity=s) }}" class="{{ 'active' if severity_filter == s }}">{{ s }}</a>{% endfor %}
+  {% for st in statuses %}<a href="{{ url_for('findings', status=st) }}" class="{{ 'active' if status_filter == st }}">{{ st }}</a>{% endfor %}
+</div>
+
+<table>
+  <thead><tr><th>Rule</th><th>Title</th><th>Resource</th><th>Severity</th><th>Status</th><th>Owner</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for f in findings %}
+    <tr class="{% if f.severity == 'Critical' and f.status not in ['Remediated','Verified'] %}risk-HIGH{% endif %}">
+      <td><span class="rule-chip">{{ f.rule_id }}</span></td>
+      <td>{{ f.title }}{% if f.description %}<br><small style="color:var(--text-muted)">{{ f.description }}</small>{% endif %}{% if f.notes %}<br><small style="color:var(--accent)"><strong>Notes:</strong> {{ f.notes|replace('\n', ' · ') }}</small>{% endif %}</td>
+      <td>{{ f.resource.name if f.resource else "—" }}</td>
+      <td><span class="badge {{ f.severity }}">{{ f.severity }}</span></td>
+      <td><span class="status-pill {{ f.status }}">{{ f.status }}</span></td>
+      <td>{{ f.owner or "—" }}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_finding', finding_id=f.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == f.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <input name="owner" value="{{ f.owner or '' }}" placeholder="owner" style="width:100px">
+          <input name="notes" placeholder="note">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

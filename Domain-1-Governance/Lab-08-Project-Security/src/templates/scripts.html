@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Third-Party Script / Code Integrity Register</h1>
+<p class="subtitle">Every script running on a customer-facing page, and whether it's integrity-protected — the exact control missing at British Airways in 2018.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Script</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Script Name</label><input name="name" required placeholder="e.g. payment-widget.js" style="min-width:200px"></div>
+    <div class="field"><label>Page Context</label><input name="page_context" required placeholder="e.g. Payment Checkout Page" style="min-width:200px"></div>
+    <div class="field"><label>Source URL</label><input name="source_url" placeholder="https://..." style="min-width:220px"></div>
+    <div class="field"><label>Risk Level</label>
+      <select name="risk_level">{% for r in risk_levels %}<option>{{ r }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Last Reviewed</label><input type="date" name="last_reviewed"></div>
+    <div class="field" style="flex-direction:row; align-items:center; gap:6px;">
+      <input type="checkbox" name="sri_pinned" id="sri_new" style="width:auto;"> <label for="sri_new" style="margin:0;">SRI hash pinned</label>
+    </div>
+    <button class="btn">Add Script</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Script</th><th>Page</th><th>Risk</th><th>SRI Pinned?</th><th>Last Reviewed</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for s in scripts %}
+    <tr class="{% if not s.sri_pinned and s.risk_level in ['Critical','High'] %}risk-HIGH{% endif %}">
+      <td>{{ s.name }}<br><small style="color:var(--text-muted)">{{ s.source_url or "" }}</small></td>
+      <td>{{ s.page_context }}</td>
+      <td><span class="badge {{ s.risk_level }}">{{ s.risk_level }}</span></td>
+      <td>{% if s.sri_pinned %}<span class="sri-yes">✓ Yes</span>{% else %}<span class="sri-no">✗ No</span>{% endif %}</td>
+      <td>{{ s.last_reviewed or "—" }}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_script', script_id=s.id) }}" class="inline-form no-print">
+          <input type="checkbox" name="sri_pinned" {% if s.sri_pinned %}checked{% endif %} style="width:auto;">
+          <input type="date" name="last_reviewed" value="{{ s.last_reviewed or '' }}">
+          <input name="notes" placeholder="note" style="width:140px">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+    {% if s.notes %}<tr><td colspan="6"><small style="color:var(--text-muted)">{{ s.notes }}</small></td></tr>{% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

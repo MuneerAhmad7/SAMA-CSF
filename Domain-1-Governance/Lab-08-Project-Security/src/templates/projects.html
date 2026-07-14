@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Project Register</h1>
+<p class="subtitle">Every project gets 6 security gates automatically: Initiation → Design → Build → Test → Deploy → Post-Implementation</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Project</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Name</label><input name="name" required style="min-width:220px"></div>
+    <div class="field"><label>Type</label>
+      <select name="project_type">{% for t in project_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Business Unit</label><input name="business_unit"></div>
+    <div class="field"><label>Criticality</label>
+      <select name="criticality">{% for c in criticalities %}<option>{{ c }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <button class="btn">Add Project</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Business Unit</th><th>Criticality</th><th>Owner</th><th>Gate Compliance</th></tr></thead>
+  <tbody>
+  {% for p in projects %}
+    <tr class="{% if compliance.get(p.id, 0) < 60 %}risk-HIGH{% endif %}">
+      <td><a href="{{ url_for('project_detail', project_id=p.id) }}">{{ p.name }}</a></td>
+      <td>{{ p.project_type }}</td>
+      <td>{{ p.business_unit or "—" }}</td>
+      <td><span class="badge {{ p.criticality }}">{{ p.criticality }}</span></td>
+      <td>{{ p.owner or "—" }}</td>
+      <td><strong>{{ compliance.get(p.id, 0) }}%</strong></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

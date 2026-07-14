@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Output Sample Review Log</h1>
+<p class="subtitle">You can't test every possible AI output — so you sample a batch of real outputs, score them against a rubric, and trend the rate over time. This log <em>is</em> the audit evidence for a non-deterministic system.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log a Sample Review Batch</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>AI System</label>
+      <select name="ai_system_id">{% for s in systems %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Sample Date</label><input type="date" name="sample_date"></div>
+    <div class="field"><label>Sample Size</label><input type="number" name="sample_size" required min="1" style="width:90px"></div>
+    <div class="field"><label>Reviewer</label><input name="reviewer"></div>
+    <div class="field"><label>Accurate</label><input type="number" name="accurate_count" min="0" style="width:80px"></div>
+    <div class="field"><label>Inaccurate</label><input type="number" name="inaccurate_count" min="0" style="width:80px"></div>
+    <div class="field"><label>Escalation Needed</label><input type="number" name="escalation_needed_count" min="0" style="width:80px"></div>
+    <div class="field"><label>Notes</label><input name="notes" style="min-width:220px"></div>
+    <button class="btn">Log Batch</button>
+  </form>
+  <p class="small" style="color:var(--text-muted); margin-top:8px;">Accurate + Inaccurate should sum to (or be part of) Sample Size. Escalation Needed counts outputs that should have triggered a human handoff, whether or not they were also inaccurate.</p>
+</div>
+
+<table>
+  <thead><tr><th>System</th><th>Date</th><th>Size</th><th>Breakdown</th><th>Accuracy</th><th>Reviewer</th></tr></thead>
+  <tbody>
+  {% for s in samples %}
+    {% set acc_pct = ((s.accurate_count / s.sample_size * 100) | round(1)) if s.sample_size else 0 %}
+    {% set inacc_pct = ((s.inaccurate_count / s.sample_size * 100) | round(1)) if s.sample_size else 0 %}
+    {% set esc_pct = ((s.escalation_needed_count / s.sample_size * 100) | round(1)) if s.sample_size else 0 %}
+    <tr>
+      <td>{{ s.ai_system.name if s.ai_system else "—" }}</td>
+      <td>{{ s.sample_date }}</td>
+      <td>{{ s.sample_size }}</td>
+      <td style="min-width:160px">
+        <div class="sample-bar">
+          <div class="seg-accurate" style="width:{{ acc_pct }}%"></div>
+          <div class="seg-inaccurate" style="width:{{ inacc_pct }}%"></div>
+          <div class="seg-escalation" style="width:{{ esc_pct }}%"></div>
+        </div>
+        <small style="color:var(--text-muted)">{{ s.accurate_count }} accurate · {{ s.inaccurate_count }} inaccurate · {{ s.escalation_needed_count }} needed escalation</small>
+      </td>
+      <td><strong>{{ acc_pct }}%</strong></td>
+      <td>{{ s.reviewer or "—" }}</td>
+    </tr>
+    {% if s.notes %}<tr><td colspan="6"><small style="color:var(--text-muted)">{{ s.notes }}</small></td></tr>{% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

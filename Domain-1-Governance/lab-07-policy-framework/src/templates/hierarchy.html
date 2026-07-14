@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Policy Hierarchy</h1>
+<p class="subtitle">Master Policy → Domain Policies → Standards / Procedures — the structure Marriott/Starwood's integration lacked in practice</p>
+
+{% macro render_node(node) %}
+  <li>
+    <div class="tree-node">
+      <span class="type-tag">{{ node.policy.policy_type }}</span>
+      <strong>{{ node.policy.title }}</strong>
+      <span class="status-pill {{ node.policy.status }}">{{ node.policy.status }}</span>
+      {% if node.policy.domain %}<span class="badge Low">{{ node.policy.domain }}</span>{% endif %}
+      <span style="color:var(--text-muted); font-size:0.8rem;">v{{ node.policy.version }}</span>
+    </div>
+    {% if node.children %}
+    <ul>
+      {% for child in node.children %}
+        {{ render_node(child) }}
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </li>
+{% endmacro %}
+
+<ul class="tree">
+  {% for node in tree %}
+    {{ render_node(node) }}
+  {% else %}
+    <p class="subtitle">No policies yet — add some in the Policy Register.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

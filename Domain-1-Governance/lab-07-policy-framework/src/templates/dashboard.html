@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Policy Framework Dashboard</h1>
+<p class="subtitle">SAMA CSF 1.3 / 4.2, NCA ECC 1‑3 / 4‑1</p>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ total }}</div><div class="label">Total Policies/Standards/Procedures</div></div>
+  <div class="metric-card"><div class="value">{{ published }}</div><div class="label">Currently Published</div></div>
+  <div class="metric-card {% if coverage_pct < 90 %}danger{% endif %}"><div class="value">{{ coverage_pct }}%</div><div class="label">Control Domain Coverage</div></div>
+  <div class="metric-card {% if overdue_reviews|length > 0 %}danger{% endif %}"><div class="value">{{ overdue_reviews|length }}</div><div class="label">Overdue Policy Reviews</div></div>
+  <div class="metric-card"><div class="value">{{ entity_count }}</div><div class="label">Tracked Entities</div></div>
+  <div class="metric-card {% if avg_integration < 80 %}danger{% endif %}"><div class="value">{{ avg_integration }}%</div><div class="label">Avg. Entity Integration</div></div>
+</div>
+
+{% if gap_domains %}
+<div class="alert-banner">
+  <strong>⚠ {{ gap_domains|length }} control domain(s) with no Approved/Published policy</strong>
+  {{ gap_domains|join(', ') }} — see Coverage Gaps for detail.
+</div>
+{% endif %}
+
+{% if at_risk_entities %}
+<div class="alert-banner">
+  <strong>⚠ {{ at_risk_entities|length }} entit{{ 'y' if at_risk_entities|length == 1 else 'ies' }} below 70% policy integration</strong>
+  This is exactly the situation behind the Marriott/Starwood breach — an acquired entity operating under old assumptions. See M&A / Entities.
+</div>
+{% endif %}
+
+{% if overdue_reviews %}
+<h2>Overdue Policy Reviews</h2>
+<table>
+  <thead><tr><th>Title</th><th>Domain</th><th>Version</th><th>Review Date</th></tr></thead>
+  <tbody>
+  {% for p in overdue_reviews %}
+    <tr><td>{{ p.title }}</td><td>{{ p.domain or "—" }}</td><td>{{ p.version }}</td><td><strong style="color:var(--critical)">{{ p.review_date }}</strong></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

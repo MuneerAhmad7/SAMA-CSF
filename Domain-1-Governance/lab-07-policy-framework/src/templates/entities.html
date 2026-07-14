@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>M&amp;A / Third-Entity Integration Register</h1>
+<p class="subtitle">The register that should have existed for Starwood — every acquired or partner entity, with a live policy-framework integration percentage.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Entity</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Name</label><input name="name" required style="min-width:200px"></div>
+    <div class="field"><label>Type</label>
+      <select name="entity_type">{% for t in entity_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Acquired/Onboarded Date</label><input type="date" name="acquired_or_onboarded_date"></div>
+    <div class="field"><label>Integration %</label><input type="number" min="0" max="100" name="integration_pct" value="0"></div>
+    <div class="field"><label>Gap Notes</label><input name="gap_notes" style="min-width:220px"></div>
+    <button class="btn">Add Entity</button>
+  </form>
+</div>
+
+{% for e in entities %}
+<div class="entity-card">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <strong>{{ e.name }}</strong>
+      <span class="badge Low">{{ e.entity_type }}</span>
+      <span style="color:var(--text-muted); font-size:0.82rem;">since {{ e.acquired_or_onboarded_date or "—" }}</span>
+    </div>
+    <div style="font-size:1.4rem; font-weight:700; {% if e.integration_pct < 70 %}color:var(--critical){% elif e.integration_pct < 90 %}color:var(--medium){% else %}color:var(--ok){% endif %}">
+      {{ e.integration_pct }}%
+    </div>
+  </div>
+  <div class="integration-track">
+    <div class="integration-fill {% if e.integration_pct >= 90 %}good{% elif e.integration_pct >= 70 %}warn{% else %}bad{% endif %}" style="width:{{ e.integration_pct }}%"></div>
+  </div>
+  {% if e.gap_notes %}<p style="margin-top:10px; font-size:0.85rem; color:var(--text-muted);"><strong>Gaps:</strong> {{ e.gap_notes }}</p>{% endif %}
+  <form method="post" action="{{ url_for('update_entity', entity_id=e.id) }}" class="inline-form no-print" style="margin-top:10px;">
+    <input type="number" min="0" max="100" name="integration_pct" value="{{ e.integration_pct }}" style="width:80px">
+    <input name="gap_notes" value="{{ e.gap_notes or '' }}" placeholder="update gap notes" style="min-width:260px">
+    <button class="btn small">Update</button>
+  </form>
+</div>
+{% endfor %}
+{% endblock %}

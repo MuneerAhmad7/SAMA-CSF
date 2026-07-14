@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>AI System Inventory</h1>
+<p class="subtitle">Every AI/ML system in use, risk-tiered by customer-facing impact and decision autonomy.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add AI System</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Name</label><input name="name" required style="min-width:200px"></div>
+    <div class="field"><label>Type</label>
+      <select name="system_type">{% for t in system_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Risk Tier</label>
+      <select name="risk_tier">{% for r in risk_tiers %}<option>{{ r }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <div class="field"><label>Model Version</label><input name="model_version"></div>
+    <div class="field"><label>Deployed Date</label><input type="date" name="deployed_date"></div>
+    <div class="field"><label>Description</label><input name="description" style="min-width:220px"></div>
+    <button class="btn">Add System</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Risk Tier</th><th>Owner</th><th>Version</th><th>Sampled Accuracy</th></tr></thead>
+  <tbody>
+  {% for s in systems %}
+    <tr>
+      <td><a href="{{ url_for('system_detail', system_id=s.id) }}">{{ s.name }}</a></td>
+      <td>{{ s.system_type }}</td>
+      <td><span class="badge {{ s.risk_tier }}">{{ s.risk_tier }}</span></td>
+      <td>{{ s.owner or "—" }}</td>
+      <td>{{ s.model_version or "—" }}</td>
+      <td><strong>{{ accuracy_map.get(s.id) if accuracy_map.get(s.id) is not none else "No samples" }}{{ "%" if accuracy_map.get(s.id) is not none }}</strong></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

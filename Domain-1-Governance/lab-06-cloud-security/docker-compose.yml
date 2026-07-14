@@ -1,0 +1,11 @@
+services:
+  cspm:
+    build: ./src
+    container_name: cspm-lab07
+    ports:
+      - "5006:5006"
+    volumes:
+      - cspm_data:/app/instance
+
+volumes:
+  cspm_data:

@@ -1,0 +1,11 @@
+services:
+  policy-framework:
+    build: ./src
+    container_name: policy-framework-lab06
+    ports:
+      - "5005:5005"
+    volumes:
+      - policyframework_data:/app/instance
+
+volumes:
+  policyframework_data:

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Policy Register</h1>
+<p class="subtitle">Full lifecycle: Draft → Review → Approved → Published → Retired</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Policy / Standard / Procedure</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Title</label><input name="title" required style="min-width:220px"></div>
+    <div class="field"><label>Type</label>
+      <select name="policy_type">{% for t in policy_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Control Domain</label>
+      <select name="domain"><option value="">— none —</option>{% for d in domains %}<option>{{ d }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Parent (for hierarchy)</label>
+      <select name="parent_id"><option value="">— top level —</option>
+        {% for p in possible_parents %}<option value="{{ p.id }}">{{ p.title }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <div class="field"><label>Version</label><input name="version" value="0.1"></div>
+    <div class="field"><label>Effective Date</label><input type="date" name="effective_date"></div>
+    <div class="field"><label>Review Date</label><input type="date" name="review_date"></div>
+    <div class="field"><label>Notes</label><input name="notes" style="min-width:200px"></div>
+    <button class="btn">Add</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Title</th><th>Type</th><th>Domain</th><th>Owner</th><th>Version</th><th>Review Date</th><th>Status</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for p in policies %}
+    <tr class="{% if p.status == 'Published' and p.review_date and p.review_date < today %}risk-HIGH{% endif %}">
+      <td>{{ p.title }}</td>
+      <td>{{ p.policy_type }}</td>
+      <td>{{ p.domain or "—" }}</td>
+      <td>{{ p.owner or "—" }}</td>
+      <td>{{ p.version }}</td>
+      <td>{{ p.review_date or "—" }}</td>
+      <td><span class="status-pill {{ p.status }}">{{ p.status }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('update_policy', policy_id=p.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == p.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <input name="version" value="{{ p.version }}" style="width:60px">
+          <input type="date" name="review_date" value="{{ p.review_date or '' }}">
+          <input name="owner" value="{{ p.owner or '' }}" placeholder="updated by" style="width:100px">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,11 @@
+services:
+  ai-governance:
+    build: ./src
+    container_name: ai-governance-lab10
+    ports:
+      - "5009:5009"
+    volumes:
+      - aigovernance_data:/app/instance
+
+volumes:
+  aigovernance_data:

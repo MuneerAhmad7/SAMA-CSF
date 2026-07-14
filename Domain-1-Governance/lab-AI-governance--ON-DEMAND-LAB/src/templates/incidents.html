@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>AI Incident Log</h1>
+<p class="subtitle">Every time an AI output caused a real problem, tracked exactly like a security incident.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log Incident</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>AI System</label>
+      <select name="ai_system_id">{% for s in systems %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" name="incident_date"></div>
+    <div class="field"><label>Severity</label>
+      <select name="severity">{% for sev in severities %}<option>{{ sev }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Description</label><input name="description" required style="min-width:240px"></div>
+    <div class="field"><label>Root Cause</label><input name="root_cause" style="min-width:200px"></div>
+    <div class="field"><label>Remediation</label><input name="remediation" style="min-width:200px"></div>
+    <button class="btn">Log Incident</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>System</th><th>Date</th><th>Severity</th><th>Description</th><th>Root Cause</th><th>Status</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for i in incidents %}
+    <tr class="{% if i.status != 'Resolved' and i.severity in ['Critical','High'] %}risk-HIGH{% endif %}">
+      <td>{{ i.ai_system.name if i.ai_system else "—" }}</td>
+      <td>{{ i.incident_date }}</td>
+      <td><span class="badge {{ i.severity }}">{{ i.severity }}</span></td>
+      <td>{{ i.description }}</td>
+      <td><small style="color:var(--text-muted)">{{ i.root_cause or "—" }}</small></td>
+      <td><span class="status-pill {{ i.status }}">{{ i.status }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('update_incident', incident_id=i.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            <option {% if i.status == 'Open' %}selected{% endif %}>Open</option>
+            <option {% if i.status == 'Investigating' %}selected{% endif %}>Investigating</option>
+            <option {% if i.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+          </select>
+          <input name="remediation" placeholder="remediation update" style="width:160px">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+    {% if i.remediation %}<tr><td colspan="7"><small style="color:var(--text-muted)"><strong>Remediation:</strong> {{ i.remediation }}</small></td></tr>{% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

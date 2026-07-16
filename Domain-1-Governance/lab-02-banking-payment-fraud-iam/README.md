@@ -113,7 +113,3 @@ lab-02-banking-payment-fraud-iam/
 ## 8. Why this matters for a banking employer
 
 This lab is deliberately built around a breach that **actually happened to a central bank**, not a toy CTF scenario. Being able to say *"I rebuilt the exact control failures behind the Bangladesh Bank SWIFT heist and implemented the fixes SAMA now mandates"* is a materially stronger portfolio statement than "I read about IAM."
-
-## 9. Next lab
-
-**Lab 03 — NCA ECC 2‑7 Vulnerability Management**, built around a real-world unpatched-system breach (Equifax, 2017), with hands-on vulnerability scanning and SLA-based patch tracking.

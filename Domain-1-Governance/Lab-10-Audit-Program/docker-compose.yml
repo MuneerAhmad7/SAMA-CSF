@@ -1,0 +1,11 @@
+services:
+  audit-assurance:
+    build: ./src
+    container_name: audit-assurance-lab11
+    ports:
+      - "5010:5010"
+    volumes:
+      - audit_data:/app/instance
+
+volumes:
+  audit_data:

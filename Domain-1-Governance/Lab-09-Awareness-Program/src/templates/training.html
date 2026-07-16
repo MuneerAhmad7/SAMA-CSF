@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Training Assignments</h1>
+<p class="subtitle">Every assignment tracked from Not Started through Completed, with due dates.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Assign Training</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Employee</label>
+      <select name="employee_id">{% for e in employees %}<option value="{{ e.id }}">{{ e.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Course</label>
+      <select name="course_id">{% for c in courses %}<option value="{{ c.id }}">{{ c.title }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Assigned Date</label><input type="date" name="assigned_date"></div>
+    <div class="field"><label>Due Date</label><input type="date" name="due_date"></div>
+    <button class="btn">Assign</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Employee</th><th>Course</th><th>Due Date</th><th>Status</th><th>Completed</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for a in assignments %}
+    <tr class="{% if a.status == 'Overdue' %}risk-HIGH{% endif %}">
+      <td>{{ a.employee.name if a.employee else "—" }}</td>
+      <td>{{ a.course.title if a.course else "—" }}</td>
+      <td>{{ a.due_date or "—" }}</td>
+      <td><span class="status-pill {{ a.status|replace(' ', '-') }}">{{ a.status }}</span></td>
+      <td>{{ a.completed_date or "—" }}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_training', assignment_id=a.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == a.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <input type="date" name="completed_date">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

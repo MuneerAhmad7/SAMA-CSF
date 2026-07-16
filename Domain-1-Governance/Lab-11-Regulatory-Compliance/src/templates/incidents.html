@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Log Incident</h1>
+<p class="subtitle">Select every regulatory framework this incident could trigger — each becomes its own tracked notification clock.</p>
+
+<div class="card">
+  <form method="post" class="form-stack">
+    <div class="field"><label>Title</label><input name="title" required style="width:100%"></div>
+    <div class="field"><label>Discovered At</label><input type="datetime-local" name="discovered_at" required></div>
+    <div class="field"><label>Severity</label>
+      <select name="severity">{% for s in severities %}<option>{{ s }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Description</label><textarea name="description"></textarea></div>
+    <div class="field"><label>Affected Data Types</label><input name="affected_data_types" placeholder="e.g. names, card numbers, national IDs" style="width:100%"></div>
+    <div class="field">
+      <label>Applicable Regulatory Frameworks (select all that apply)</label>
+      {% for fw in frameworks %}
+        <div style="margin:4px 0;">
+          <input type="checkbox" name="framework_ids" value="{{ fw.id }}" id="fw_{{ fw.id }}" style="width:auto;">
+          <label for="fw_{{ fw.id }}" style="margin:0;">{{ fw.name }} ({{ fw.critical_notification_deadline_hours }}h deadline)</label>
+        </div>
+      {% endfor %}
+    </div>
+    <button class="btn">Log Incident &amp; Create Notification Requirements</button>
+  </form>
+</div>
+
+<h2>Previously Logged Incidents</h2>
+<table>
+  <thead><tr><th>Title</th><th>Discovered</th><th>Severity</th><th>Notification Requirements</th></tr></thead>
+  <tbody>
+  {% for i in incidents %}
+    <tr><td>{{ i.title }}</td><td>{{ i.discovered_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    <td><span class="badge {{ i.severity }}">{{ i.severity }}</span></td><td>{{ i.notifications|length }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

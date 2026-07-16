@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Findings Register</h1>
+<p class="subtitle">Severity-based remediation SLA: Critical 30 days · High 60 days · Medium 90 days · Low 180 days</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log New Finding</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Engagement</label>
+      <select name="engagement_id">{% for e in engagements %}<option value="{{ e.id }}">{{ e.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Title</label><input name="title" required style="min-width:220px"></div>
+    <div class="field"><label>Category</label><input name="category" placeholder="e.g. Access Control, Build Pipeline Security"></div>
+    <div class="field"><label>Severity</label>
+      <select name="severity">{% for s in severities %}<option>{{ s }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <div class="field"><label>Description</label><input name="description" style="min-width:200px"></div>
+    <div class="field"><label>Recommendation</label><input name="recommendation" style="min-width:200px"></div>
+    <div class="field" style="flex-direction:row; align-items:center; gap:6px;">
+      <input type="checkbox" name="is_repeat" id="rep_new" style="width:auto;"> <label for="rep_new" style="margin:0;">Repeat finding</label>
+    </div>
+    <div class="field"><label>Repeat Notes</label><input name="repeat_notes" placeholder="e.g. also identified in 2024 internal review"></div>
+    <button class="btn">Log Finding</button>
+  </form>
+</div>
+
+<div class="filters no-print">
+  <a href="{{ url_for('findings') }}" class="{{ 'active' if not severity_filter and not status_filter }}">All</a>
+  {% for s in severities %}<a href="{{ url_for('findings', severity=s) }}" class="{{ 'active' if severity_filter == s }}">{{ s }}</a>{% endfor %}
+  {% for st in statuses %}<a href="{{ url_for('findings', status=st) }}" class="{{ 'active' if status_filter == st }}">{{ st }}</a>{% endfor %}
+</div>
+
+<table>
+  <thead><tr><th>Title</th><th>Category</th><th>Engagement</th><th>Severity</th><th>SLA Status</th><th>Status</th><th>Repeat?</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for f in findings %}
+    {% set overdue = sla.is_overdue(f, now) %}
+    <tr class="{% if overdue %}risk-HIGH{% endif %}">
+      <td>{{ f.title }}{% if f.description %}<br><small style="color:var(--text-muted)">{{ f.description }}</small>{% endif %}</td>
+      <td>{{ f.category or "—" }}</td>
+      <td>{{ f.engagement.name if f.engagement else "—" }}</td>
+      <td><span class="badge {{ f.severity }}">{{ f.severity }}</span></td>
+      <td>{% if f.status in ['Remediated','Verified Closed'] %}<span class="sla-tag">Closed</span>{% elif overdue %}<strong style="color:var(--critical)">OVERDUE {{ sla.days_overdue(f, now) }}d</strong>{% else %}<span class="sla-tag">Within SLA</span>{% endif %}</td>
+      <td><span class="status-pill {{ f.status|replace(' ', '-') }}">{{ f.status }}</span></td>
+      <td>{% if f.is_repeat %}<span class="repeat-tag">Repeat</span>{% if f.repeat_notes %}<br><small style="color:var(--text-muted)">{{ f.repeat_notes }}</small>{% endif %}{% else %}—{% endif %}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_finding', finding_id=f.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == f.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <input name="owner" value="{{ f.owner or '' }}" placeholder="owner" style="width:100px">
+          <input name="note" placeholder="update note">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+    {% if f.root_cause %}<tr><td colspan="8"><small style="color:var(--text-muted)"><strong>Root cause / update history:</strong> {{ f.root_cause|replace('\n', ' · ') }}</small></td></tr>{% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

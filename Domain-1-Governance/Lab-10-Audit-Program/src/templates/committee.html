@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Audit Committee Reports</h1>
+<p class="subtitle">A finding that never reaches a committee agenda might as well not exist for governance purposes.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log Committee Report</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Meeting Date</label><input type="date" name="meeting_date"></div>
+    <div class="field"><label>Attendees</label><input name="attendees" style="min-width:220px"></div>
+    <div class="field"><label>Summary</label><input name="summary" style="min-width:260px"></div>
+    <div class="field"><label>Overdue Findings Highlighted</label><input name="overdue_highlighted" style="min-width:260px"></div>
+    <button class="btn">Log Report</button>
+  </form>
+</div>
+
+{% for r in reports %}
+<div class="card">
+  <h3 style="margin-top:0;">{{ r.meeting_date }}</h3>
+  <p><strong>Attendees:</strong> {{ r.attendees }}</p>
+  <p><strong>Summary:</strong> {{ r.summary }}</p>
+  <p><strong>Overdue Findings Highlighted:</strong> {{ r.overdue_highlighted }}</p>
+</div>
+{% else %}
+<p class="subtitle">No committee reports logged yet.</p>
+{% endfor %}
+{% endblock %}

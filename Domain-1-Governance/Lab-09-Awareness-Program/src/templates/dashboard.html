@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Security Awareness Program Dashboard</h1>
+<p class="subtitle">SAMA CSF 1.6 / 1.7 — NCA ECC 1‑10</p>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ employee_count }}</div><div class="label">Employees Tracked</div></div>
+  <div class="metric-card {% if completion_pct < 90 %}danger{% endif %}"><div class="value">{{ completion_pct }}%</div><div class="label">Overall Training Completion</div></div>
+  <div class="metric-card {% if overdue_count > 0 %}danger{% endif %}"><div class="value">{{ overdue_count }}</div><div class="label">Overdue Training Assignments</div></div>
+  <div class="metric-card {% if offenders|length > 0 %}danger{% endif %}"><div class="value">{{ offenders|length }}</div><div class="label">Repeat Simulation Offenders</div></div>
+</div>
+
+{% if priv_vishing_fails %}
+<div class="alert-banner">
+  <strong>⚠ {{ priv_vishing_fails|length }} privileged employee(s) failed a vishing simulation</strong>
+  This is the exact risk profile behind the 2020 Twitter breach — a privileged employee successfully socially engineered over the phone. Immediate follow-up training required.
+</div>
+{% endif %}
+
+<h2>Simulation Campaign Results</h2>
+{% for stat in campaign_stats %}
+<div class="campaign-card">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div>
+      <strong>{{ stat.campaign.name }}</strong>
+      <span class="badge Low">{{ stat.campaign.campaign_type }}</span>
+      <span style="color:var(--text-muted); font-size:0.82rem;">{{ stat.campaign.launch_date }}</span>
+    </div>
+    <div style="font-size:1.3rem; font-weight:700; {% if stat.fail_rate > 20 %}color:var(--critical){% elif stat.fail_rate > 5 %}color:var(--medium){% else %}color:var(--ok){% endif %}">
+      {{ stat.fail_rate }}% failed
+    </div>
+  </div>
+  <div class="fail-track"><div class="fail-fill" style="width:{{ stat.fail_rate }}%"></div></div>
+  <p style="margin-top:8px; font-size:0.85rem; color:var(--text-muted);">{{ stat.failed }} of {{ stat.total }} employees failed · {{ stat.reported }} reported it correctly ({{ stat.report_rate }}%)</p>
+</div>
+{% endfor %}
+
+{% if offenders %}
+<h2>Repeat Offenders (2+ failed simulations)</h2>
+<table>
+  <thead><tr><th>Employee</th><th>Department</th><th>Privileged?</th><th>Failed Simulations</th></tr></thead>
+  <tbody>
+  {% for emp, failures in offenders %}
+    <tr class="risk-HIGH">
+      <td>{{ emp.name }}</td><td>{{ emp.department }}</td>
+      <td>{% if emp.is_privileged %}<span class="privileged-tag">Privileged</span>{% else %}—{% endif %}</td>
+      <td>{{ failures|length }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if overdue %}
+<h2>Overdue Training</h2>
+<table>
+  <thead><tr><th>Employee</th><th>Course</th><th>Due Date</th></tr></thead>
+  <tbody>
+  {% for a in overdue %}
+    <tr><td>{{ a.employee.name if a.employee else "—" }}</td><td>{{ a.course.title if a.course else "—" }}</td><td>{{ a.due_date }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

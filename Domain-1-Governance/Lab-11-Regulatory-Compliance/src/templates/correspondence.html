@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Regulatory Correspondence Log</h1>
+<p class="subtitle">Every formal exchange with SAMA, NCA, or SDAIA, with its own due date.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Log Correspondence</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Framework</label>
+      <select name="framework_id">{% for fw in frameworks %}<option value="{{ fw.id }}">{{ fw.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Regulator</label>
+      <select name="regulator">{% for r in regulators %}<option>{{ r }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Type</label>
+      <select name="correspondence_type">{% for t in types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Date</label><input type="date" name="date"></div>
+    <div class="field"><label>Due Date</label><input type="date" name="due_date"></div>
+    <div class="field"><label>Subject</label><input name="subject" required style="min-width:220px"></div>
+    <div class="field"><label>Notes</label><input name="notes" style="min-width:200px"></div>
+    <button class="btn">Log Correspondence</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Date</th><th>Regulator</th><th>Type</th><th>Subject</th><th>Due Date</th><th>Status</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for c in correspondence %}
+    <tr class="{% if c.status != 'Closed' and c.due_date and c.due_date < today %}risk-HIGH{% endif %}">
+      <td>{{ c.date }}</td>
+      <td>{{ c.regulator }}</td>
+      <td>{{ c.correspondence_type }}</td>
+      <td>{{ c.subject }}{% if c.notes %}<br><small style="color:var(--text-muted)">{{ c.notes }}</small>{% endif %}</td>
+      <td>{{ c.due_date or "—" }}</td>
+      <td><span class="status-pill {{ c.status }}">{{ c.status }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('update_correspondence', corr_id=c.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == c.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

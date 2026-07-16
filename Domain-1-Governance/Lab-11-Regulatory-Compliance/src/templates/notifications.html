@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Incident Notification Tracker</h1>
+<p class="subtitle">Every incident, checked against every applicable regulation simultaneously. One incident, multiple independent clocks.</p>
+
+{% for i in incidents %}
+<div class="incident-block">
+  <h3>{{ i.title }} <span class="badge {{ i.severity }}">{{ i.severity }}</span></h3>
+  <p class="subtitle" style="margin:0 0 10px;">Discovered: {{ i.discovered_at.strftime('%Y-%m-%d %H:%M UTC') }} · {{ i.affected_data_types or "" }}</p>
+  {% if i.description %}<p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:14px;">{{ i.description }}</p>{% endif %}
+
+  <table>
+    <thead><tr><th>Framework</th><th>Deadline</th><th>Notified At</th><th>Status</th><th>Margin</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for req in i.notifications %}
+      {% set label, css_class, value = notification_status(req, now) %}
+      <tr>
+        <td>{{ req.framework.name }} <span class="badge Low">{{ req.framework.regulator }}</span></td>
+        <td>{{ notification_deadline(req).strftime('%Y-%m-%d %H:%M') }} ({{ req.deadline_hours }}h)</td>
+        <td>{{ req.notified_at.strftime('%Y-%m-%d %H:%M') if req.notified_at else "—" }}</td>
+        <td><span class="notif-pill {{ css_class }}">{{ label }}</span></td>
+        <td>{{ format_hours(value) }} {% if css_class == 'notif-late' %}late{% elif css_class == 'notif-overdue' %}overdue{% elif css_class == 'notif-ontime' %}to spare{% else %}remaining{% endif %}</td>
+        <td>
+          {% if not req.notified_at %}
+          <form method="post" action="{{ url_for('mark_notified', req_id=req.id) }}" class="inline-form no-print">
+            <input type="datetime-local" name="notified_at" required style="width:180px">
+            <input name="notes" placeholder="note" style="width:140px">
+            <button class="btn small">Mark Notified</button>
+          </form>
+          {% else %}
+            <small style="color:var(--text-muted)">{{ req.notes or "" }}</small>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="subtitle">No incidents logged yet — go to Log Incident to create one.</p>
+{% endfor %}
+{% endblock %}

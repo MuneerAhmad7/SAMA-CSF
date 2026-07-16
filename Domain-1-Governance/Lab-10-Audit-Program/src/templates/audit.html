@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>System Audit Log</h1>
+<p class="subtitle">Every change made in this tracker itself — not to be confused with the audit engagements it manages.</p>
+<table>
+  <thead><tr><th>Time (UTC)</th><th>Actor</th><th>Action</th><th>Details</th></tr></thead>
+  <tbody>
+  {% for l in logs %}
+    <tr>
+      <td>{{ l.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{ l.actor }}</td>
+      <td>{{ l.action }}</td>
+      <td>{{ l.details }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

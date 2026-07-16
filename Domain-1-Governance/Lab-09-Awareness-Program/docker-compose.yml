@@ -1,0 +1,11 @@
+services:
+  awareness:
+    build: ./src
+    container_name: awareness-lab09
+    ports:
+      - "5008:5008"
+    volumes:
+      - awareness_data:/app/instance
+
+volumes:
+  awareness_data:

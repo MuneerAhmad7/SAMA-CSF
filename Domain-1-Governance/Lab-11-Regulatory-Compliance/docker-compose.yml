@@ -1,0 +1,11 @@
+services:
+  regulatory-compliance:
+    build: ./src
+    container_name: regulatory-compliance-lab12
+    ports:
+      - "5011:5011"
+    volumes:
+      - regcompliance_data:/app/instance
+
+volumes:
+  regcompliance_data:

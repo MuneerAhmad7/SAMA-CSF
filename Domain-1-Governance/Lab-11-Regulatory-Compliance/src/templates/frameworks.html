@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Regulatory Framework Register</h1>
+<p class="subtitle">Every regulation/standard that applies to Falak Pay, each with its own critical-incident notification deadline.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Framework</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Name</label><input name="name" required placeholder="e.g. PDPL" style="min-width:160px"></div>
+    <div class="field"><label>Regulator</label>
+      <select name="regulator">{% for r in regulators %}<option>{{ r }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Critical Notification Deadline (hours)</label><input type="number" step="0.5" name="deadline_hours" required style="width:100px"></div>
+    <div class="field"><label>Scope</label><input name="scope_description" style="min-width:220px"></div>
+    <div class="field"><label>Owner</label><input name="owner"></div>
+    <button class="btn">Add Framework</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Name</th><th>Regulator</th><th>Notification Deadline</th><th>Scope</th><th>Owner</th></tr></thead>
+  <tbody>
+  {% for fw in frameworks %}
+    <tr>
+      <td>{{ fw.name }}</td>
+      <td>{{ fw.regulator }}</td>
+      <td><strong>{{ fw.critical_notification_deadline_hours }}h</strong></td>
+      <td>{{ fw.scope_description or "—" }}</td>
+      <td>{{ fw.owner or "—" }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

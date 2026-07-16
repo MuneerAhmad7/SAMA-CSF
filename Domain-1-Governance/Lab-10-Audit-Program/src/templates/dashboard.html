@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Audit &amp; Assurance Dashboard</h1>
+<p class="subtitle">SAMA CSF 1.8 / NCA ECC 1‑8 — remediation tracking is the control, not just the review itself</p>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ engagement_count }}</div><div class="label">Audit Engagements</div></div>
+  <div class="metric-card"><div class="value">{{ total }}</div><div class="label">Total Findings</div></div>
+  <div class="metric-card {% if overdue_count > 0 %}danger{% endif %}"><div class="value">{{ overdue_count }}</div><div class="label">Overdue Findings</div></div>
+  <div class="metric-card {% if compliant_pct < 90 %}danger{% endif %}"><div class="value">{{ compliant_pct }}%</div><div class="label">Remediation SLA Compliance</div></div>
+  <div class="metric-card {% if repeat_findings|length > 0 %}danger{% endif %}"><div class="value">{{ repeat_findings|length }}</div><div class="label">Repeat Findings</div></div>
+</div>
+
+{% if repeat_findings %}
+<div class="alert-banner">
+  <strong>⚠ {{ repeat_findings|length }} repeat finding(s) — the same weakness identified across multiple audit cycles</strong>
+  This is exactly the SolarWinds pattern — a known issue that resurfaces because remediation didn't stick. See Findings for detail.
+</div>
+{% endif %}
+
+{% if overdue %}
+<h2>Overdue Findings (highest risk first)</h2>
+<table>
+  <thead><tr><th>Title</th><th>Severity</th><th>Engagement</th><th>Days Overdue</th><th>Repeat?</th></tr></thead>
+  <tbody>
+  {% for f in overdue %}
+    <tr>
+      <td>{{ f.title }}</td>
+      <td><span class="badge {{ f.severity }}">{{ f.severity }}</span></td>
+      <td>{{ f.engagement.name if f.engagement else "—" }}</td>
+      <td><strong style="color:var(--critical)">{{ sla.days_overdue(f, now) }}d</strong></td>
+      <td>{% if f.is_repeat %}<span class="repeat-tag">Repeat</span>{% else %}—{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h2>Findings by Severity</h2>
+<table>
+  <thead><tr><th>Severity</th><th>Count</th><th>Remediation SLA</th></tr></thead>
+  <tbody>
+  {% for s in ["Critical","High","Medium","Low"] %}
+    <tr><td><span class="badge {{ s }}">{{ s }}</span></td><td>{{ severity_counts[s] }}</td>
+    <td>{{ sla.SLA_DAYS[s] }} days</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Upcoming / In-Progress Engagements</h2>
+<table>
+  <thead><tr><th>Engagement</th><th>Type</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for e in upcoming %}
+    <tr><td>{{ e.name }}</td><td>{{ e.engagement_type }}</td><td><span class="status-pill {{ e.status|replace(' ', '-') }}">{{ e.status }}</span></td></tr>
+  {% else %}
+    <tr><td colspan="3" style="color:var(--text-muted)">No upcoming engagements.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

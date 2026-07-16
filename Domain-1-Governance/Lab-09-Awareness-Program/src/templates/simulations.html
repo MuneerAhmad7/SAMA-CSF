@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Simulation Campaigns</h1>
+<p class="subtitle">Email phishing and vishing simulations, per-employee outcomes. Vishing coverage is the specific control this lab adds on top of a typical email-only phishing program.</p>
+
+{% for c in campaigns %}
+<div class="card">
+  <h2 style="margin-top:0;">{{ c.name }} <span class="badge Low">{{ c.campaign_type }}</span></h2>
+  <p class="subtitle" style="margin:4px 0 12px;">{{ c.launch_date }} — {{ c.scenario_description }}</p>
+  <table>
+    <thead><tr><th>Employee</th><th>Department</th><th>Privileged?</th><th>Outcome</th><th>Notes</th></tr></thead>
+    <tbody>
+    {% for r in c.results %}
+      <tr class="{% if r.outcome in failure_outcomes and r.employee and r.employee.is_privileged %}risk-HIGH{% endif %}">
+        <td>{{ r.employee.name if r.employee else "—" }}</td>
+        <td>{{ r.employee.department if r.employee else "—" }}</td>
+        <td>{% if r.employee and r.employee.is_privileged %}<span class="privileged-tag">Privileged</span>{% else %}—{% endif %}</td>
+        <td><span class="outcome-pill {{ r.outcome|replace(' ', '-') }}">{{ r.outcome }}</span></td>
+        <td><small style="color:var(--text-muted)">{{ r.notes or "" }}</small></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endfor %}
+{% endblock %}

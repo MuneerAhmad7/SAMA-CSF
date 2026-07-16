@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Audit Engagement Register</h1>
+<p class="subtitle">Internal audits, external audits, penetration tests, and regulatory examinations.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Engagement</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Name</label><input name="name" required style="min-width:220px"></div>
+    <div class="field"><label>Type</label>
+      <select name="engagement_type">{% for t in engagement_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Scope</label><input name="scope" style="min-width:200px"></div>
+    <div class="field"><label>Start Date</label><input type="date" name="start_date"></div>
+    <div class="field"><label>End Date</label><input type="date" name="end_date"></div>
+    <div class="field"><label>Auditor</label><input name="auditor"></div>
+    <button class="btn">Add Engagement</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Name</th><th>Type</th><th>Scope</th><th>Auditor</th><th>Status</th><th>Findings</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for e in engagements %}
+    <tr>
+      <td>{{ e.name }}</td>
+      <td>{{ e.engagement_type }}</td>
+      <td>{{ e.scope or "—" }}</td>
+      <td>{{ e.auditor or "—" }}</td>
+      <td><span class="status-pill {{ e.status|replace(' ', '-') }}">{{ e.status }}</span></td>
+      <td>{{ finding_counts.get(e.id, 0) }}</td>
+      <td>
+        <form method="post" action="{{ url_for('update_engagement', engagement_id=e.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == e.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Regulatory Compliance Dashboard</h1>
+<p class="subtitle">SAMA CSF 1.9 / NCA ECC 1‑7 / PDPL — one incident, multiple independent regulatory clocks</p>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ framework_count }}</div><div class="label">Regulatory Frameworks Tracked</div></div>
+  <div class="metric-card {% if on_time_rate is not none and on_time_rate < 100 %}danger{% endif %}"><div class="value">{{ on_time_rate if on_time_rate is not none else "—" }}{{ "%" if on_time_rate is not none }}</div><div class="label">On-Time Notification Rate</div></div>
+  <div class="metric-card {% if overdue_pending|length > 0 %}danger{% endif %}"><div class="value">{{ overdue_pending|length }}</div><div class="label">Notifications Overdue Right Now</div></div>
+  <div class="metric-card {% if late_notified|length > 0 %}danger{% endif %}"><div class="value">{{ late_notified|length }}</div><div class="label">Notifications Sent Late</div></div>
+  <div class="metric-card {% if open_gaps|length > 0 %}danger{% endif %}"><div class="value">{{ open_gaps|length }}</div><div class="label">Open Compliance Gaps</div></div>
+  <div class="metric-card {% if overdue_correspondence|length > 0 %}danger{% endif %}"><div class="value">{{ overdue_correspondence|length }}</div><div class="label">Overdue Regulator Correspondence</div></div>
+</div>
+
+{% if overdue_pending %}
+<div class="alert-banner">
+  <strong>⚠ {{ overdue_pending|length }} notification(s) currently overdue and not yet sent</strong>
+  This is a live, running clock — the exact situation Uber let run for a year. See Notification Tracker.
+</div>
+{% endif %}
+
+{% if late_notified %}
+<div class="alert-banner">
+  <strong>⚠ {{ late_notified|length }} notification(s) were sent, but after the deadline</strong>
+  A late notification is still a compliance failure, even once it's sent. See Notification Tracker for detail.
+</div>
+{% endif %}
+
+<h2>Regulatory Framework Deadlines</h2>
+{% for fw in frameworks %}
+<div class="framework-card">
+  <div>
+    <strong>{{ fw.name }}</strong> <span class="badge Low">{{ fw.regulator }}</span>
+    <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">{{ fw.scope_description }}</div>
+  </div>
+  <div style="text-align:right;">
+    <div class="deadline-badge">{{ format_hours(fw.critical_notification_deadline_hours) }}</div>
+    <div style="color:var(--text-muted); font-size:0.78rem;">critical notification deadline</div>
+    {% if gap_by_framework.get(fw.id, 0) > 0 %}<div style="color:var(--critical); font-size:0.78rem; margin-top:4px;">{{ gap_by_framework[fw.id] }} open gap(s)</div>{% endif %}
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

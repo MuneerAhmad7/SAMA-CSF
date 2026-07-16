@@ -98,8 +98,6 @@ Suggested commit message: `Lab 01: SAMA CSF / NCA ECC Domain 1 - Governance prog
 - [ ] Compliance checklist scored (all 19 Domain-1 controls)
 - [ ] Assessment report exported and committed
 - [ ] Dashboard screenshot added
-- [ ] LinkedIn post published (see `linkedin-post-draft.md`)
+- [ ] LinkedIn post published (see `https://www.linkedin.com/posts/muneer-ahmad7_cybersecurity-grc-sama-activity-7480955584138297344-qCj6?utm_source=share&utm_medium=member_desktop&rcm=ACoAADNY1HoBHXW-LRwTtEQTTFgjFg5tmLkRt74`)
 
-## 8. Next lab
 
-**Lab 02 — NCA ECC Domain 2, Subdomain 2‑2: Identity & Access Management** (MFA, PAM, access reviews) — hands-on with a local Keycloak/OpenLDAP stack.

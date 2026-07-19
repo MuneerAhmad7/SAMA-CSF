@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Training &amp; Certification Plan Dashboard</h1>
+<p class="subtitle">SAMA CSF 1.7 — technical depth for the security team, distinct from Lab 09's org-wide awareness program</p>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="value">{{ member_count }}</div><div class="label">Security Team Members</div></div>
+  <div class="metric-card {% if expired_certs|length > 0 %}danger{% endif %}"><div class="value">{{ expired_certs|length }}</div><div class="label">Expired Certifications</div></div>
+  <div class="metric-card {% if expiring_certs|length > 0 %}danger{% endif %}"><div class="value">{{ expiring_certs|length }}</div><div class="label">Certifications Expiring Soon (&lt;90d)</div></div>
+  <div class="metric-card {% if plan_completion_pct < 70 %}danger{% endif %}"><div class="value">{{ plan_completion_pct }}%</div><div class="label">Training Plan Completion ({{ completed_plan }}/{{ total_plan }})</div></div>
+  <div class="metric-card {% if delayed_plan|length > 0 %}danger{% endif %}"><div class="value">{{ delayed_plan|length }}</div><div class="label">Delayed Training Items</div></div>
+  <div class="metric-card"><div class="value">SAR {{ "%.0f"|format(total_budget) }}</div><div class="label">Total Training Budget</div></div>
+</div>
+
+{% if expired_certs %}
+<div class="alert-banner">
+  <strong>⚠ {{ expired_certs|length }} expired certification(s) on the security team</strong>
+  A lapsed required credential for a technical role is itself a risk signal — see Certifications.
+</div>
+{% endif %}
+
+<h2>Widest Skill Gaps (current vs. required)</h2>
+{% if widest_gaps %}
+<table>
+  <thead><tr><th>Team Member</th><th>Skill</th><th>Current</th><th>Required</th><th>Gap</th></tr></thead>
+  <tbody>
+  {% for a, gap in widest_gaps %}
+    <tr class="{% if gap >= 2 %}risk-HIGH{% endif %}">
+      <td>{{ a.member.name }}</td>
+      <td>{{ a.skill.name }}</td>
+      <td>{{ levels[a.current_level] }}</td>
+      <td>{{ levels[a.required_level] }}</td>
+      <td><strong style="color:var(--critical)">{{ gap }}</strong></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="subtitle">No skill gaps currently recorded — see Skills Matrix to run an assessment.</p>
+{% endif %}
+{% endblock %}

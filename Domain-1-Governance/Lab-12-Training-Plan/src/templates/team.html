@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Security Team Roster</h1>
+<p class="subtitle">The technical security function specifically — not the whole organization (see Lab 09 for that).</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Team Member</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Name</label><input name="name" required style="min-width:180px"></div>
+    <div class="field"><label>Role</label>
+      <select name="role">{% for r in roles %}<option>{{ r }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Hire Date</label><input type="date" name="hire_date"></div>
+    <button class="btn">Add Member</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Name</th><th>Role</th><th>Hire Date</th><th>Certifications</th><th>Skill Gaps</th></tr></thead>
+  <tbody>
+  {% for m in members %}
+    <tr>
+      <td>{{ m.name }}</td>
+      <td>{{ m.role }}</td>
+      <td>{{ m.hire_date or "—" }}</td>
+      <td>{{ m.certifications|length }}</td>
+      <td>{{ m.skill_assessments|selectattr("required_level")|list|length }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

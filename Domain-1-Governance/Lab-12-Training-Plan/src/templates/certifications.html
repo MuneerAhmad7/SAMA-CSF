@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Certification Register</h1>
+<p class="subtitle">Tracked with expiry monitoring — a lapsed required credential is itself a risk signal.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Certification</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Team Member</label>
+      <select name="member_id">{% for m in members %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Certification</label><input name="name" required placeholder="e.g. CISSP" style="min-width:160px"></div>
+    <div class="field"><label>Issuer</label><input name="issuer" placeholder="e.g. (ISC)²"></div>
+    <div class="field"><label>Issued</label><input type="date" name="issued_date"></div>
+    <div class="field"><label>Expires</label><input type="date" name="expiry_date"></div>
+    <div class="field" style="flex-direction:row; align-items:center; gap:6px;">
+      <input type="checkbox" name="required_for_role" id="req_new" style="width:auto;"> <label for="req_new" style="margin:0;">Required for role</label>
+    </div>
+    <button class="btn">Add Certification</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Team Member</th><th>Certification</th><th>Issuer</th><th>Expires</th><th>Required?</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for c in certifications %}
+    {% set label, css_class = cert_status(c, today) %}
+    <tr class="{% if css_class in ['cert-expired','cert-expiring'] and c.required_for_role %}risk-HIGH{% endif %}">
+      <td>{{ c.member.name if c.member else "—" }}</td>
+      <td>{{ c.name }}</td>
+      <td>{{ c.issuer or "—" }}</td>
+      <td>{{ c.expiry_date or "—" }}</td>
+      <td>{{ "Yes" if c.required_for_role else "No" }}</td>
+      <td><span class="cert-pill {{ css_class }}">{{ label }}</span></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

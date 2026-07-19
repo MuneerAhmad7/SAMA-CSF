@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Skills Matrix</h1>
+<p class="subtitle">Current competency (blue dots) vs. required level for the role (red outline marker). 0=None · 1=Novice · 2=Basic · 3=Proficient · 4=Expert</p>
+
+<div class="card" style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Team Member</th>
+        {% for s in skill_list %}<th class="skill-cell">{{ s.name }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+    {% for m in members %}
+      <tr>
+        <td>{{ m.name }}<br><small style="color:var(--text-muted)">{{ m.role }}</small></td>
+        {% for s in skill_list %}
+          {% set a = matrix[m.id][s.id] %}
+          <td class="skill-cell">
+            {% if a %}
+              <div class="skill-level">
+                {% for i in range(1, 5) %}
+                  <span class="skill-dot {% if i <= a.current_level %}filled{% endif %} {% if i == a.required_level %}required-marker{% endif %}"></span>
+                {% endfor %}
+              </div>
+              {% if a.required_level > a.current_level %}
+                <span class="skill-gap-label">gap {{ a.required_level - a.current_level }}</span>
+              {% endif %}
+            {% else %}
+              <span style="color:var(--text-muted); font-size:0.75rem;">not assessed</span>
+            {% endif %}
+          </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<h2>Record / Update an Assessment</h2>
+<div class="card">
+  <form method="post" class="inline-form">
+    <div class="field"><label>Team Member</label>
+      <select name="member_id">{% for m in members %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Skill</label>
+      <select name="skill_id">{% for s in skill_list %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Current Level</label>
+      <select name="current_level">{% for lvl, name in levels.items() %}<option value="{{ lvl }}">{{ lvl }} — {{ name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Required Level</label>
+      <select name="required_level">{% for lvl, name in levels.items() %}<option value="{{ lvl }}">{{ lvl }} — {{ name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Assessed Date</label><input type="date" name="assessed_date"></div>
+    <div class="field"><label>Notes</label><input name="notes" style="min-width:220px"></div>
+    <button class="btn">Save Assessment</button>
+  </form>
+</div>
+{% endblock %}

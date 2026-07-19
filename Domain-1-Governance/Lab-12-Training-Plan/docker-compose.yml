@@ -1,0 +1,11 @@
+services:
+  training-plan:
+    build: ./src
+    container_name: training-plan-lab13
+    ports:
+      - "5012:5012"
+    volumes:
+      - trainingplan_data:/app/instance
+
+volumes:
+  trainingplan_data:

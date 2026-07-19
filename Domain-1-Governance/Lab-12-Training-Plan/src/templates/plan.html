@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Training Plan</h1>
+<p class="subtitle">Needs-assessment-driven, funded, and dated — the difference between a documented gap and a closed one.</p>
+
+<div class="card">
+  <h2 style="margin-top:0">Add Plan Item</h2>
+  <form method="post" class="inline-form">
+    <div class="field"><label>Team Member</label>
+      <select name="member_id">{% for m in members %}<option value="{{ m.id }}">{{ m.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Title</label><input name="title" required style="min-width:200px"></div>
+    <div class="field"><label>Type</label>
+      <select name="plan_type">{% for t in plan_types %}<option>{{ t }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Target Skill</label>
+      <select name="target_skill_id"><option value="">— none —</option>{% for s in skill_list %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}</select>
+    </div>
+    <div class="field"><label>Budget (SAR)</label><input type="number" step="100" name="budget" style="width:100px"></div>
+    <div class="field"><label>Target Date</label><input type="date" name="target_date"></div>
+    <div class="field"><label>Notes</label><input name="notes" style="min-width:200px"></div>
+    <button class="btn">Add Item</button>
+  </form>
+</div>
+
+<table>
+  <thead><tr><th>Title</th><th>Member</th><th>Type</th><th>Target Skill</th><th>Budget</th><th>Target Date</th><th>Status</th><th>Update</th></tr></thead>
+  <tbody>
+  {% for p in items %}
+    <tr class="{% if p.status == 'Delayed' %}risk-HIGH{% endif %}">
+      <td>{{ p.title }}</td>
+      <td>{{ p.member.name if p.member else "—" }}</td>
+      <td>{{ p.plan_type }}</td>
+      <td>{{ p.target_skill.name if p.target_skill else "—" }}</td>
+      <td>SAR {{ "%.0f"|format(p.budget or 0) }}</td>
+      <td>{{ p.target_date or "—" }}</td>
+      <td><span class="status-pill {{ p.status }}">{{ p.status }}</span></td>
+      <td>
+        <form method="post" action="{{ url_for('update_plan', item_id=p.id) }}" class="inline-form no-print">
+          <select name="status" style="padding:5px">
+            {% for s in statuses %}<option {% if s == p.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+          <input name="notes" placeholder="note" style="width:140px">
+          <button class="btn small">Save</button>
+        </form>
+      </td>
+    </tr>
+    {% if p.notes %}<tr><td colspan="8"><small style="color:var(--text-muted)">{{ p.notes|replace('\n', ' · ') }}</small></td></tr>{% endif %}
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

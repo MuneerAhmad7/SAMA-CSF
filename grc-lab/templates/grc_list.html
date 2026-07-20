@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}GRC Register · GRC Lab{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>GRC Register</h1>
+    <p class="subtitle">{{ items|length }} item(s) matching current filters</p>
+  </div>
+  <a class="btn" href="{{ url_for('grc_new') }}">+ New GRC Item</a>
+</div>
+
+<form method="get" class="filter-bar">
+  <div class="field">
+    <label>Search</label>
+    <input type="text" name="q" value="{{ search }}" placeholder="Item name or owner">
+  </div>
+  <div class="field">
+    <label>Category</label>
+    <select name="category">
+      <option value="">All</option>
+      {% for c in categories %}
+        <option value="{{ c }}" {{ 'selected' if selected_category == c }}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label>Status</label>
+    <select name="status">
+      <option value="">All</option>
+      {% for s in statuses %}
+        <option value="{{ s }}" {{ 'selected' if selected_status == s }}>{{ s }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label>Risk Level</label>
+    <select name="risk">
+      <option value="">All</option>
+      {% for r in risks %}
+        <option value="{{ r }}" {{ 'selected' if selected_risk == r }}>{{ r }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <button class="btn btn-secondary" type="submit">Apply</button>
+  </div>
+  <div class="field">
+    <a class="btn btn-secondary" href="{{ url_for('grc_list') }}">Reset</a>
+  </div>
+</form>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Sub-Category</th>
+        <th>GRC Item</th>
+        <th>Owner</th>
+        <th>Status</th>
+        <th>Risk Level</th>
+        <th>Due Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td><span class="badge badge-category-{{ item.category|lower|replace(' ', '-') }}">{{ item.category }}</span></td>
+        <td>{{ item.subcategory }}</td>
+        <td><a href="{{ url_for('grc_detail', item_id=item.id) }}">{{ item.grc_item }}</a></td>
+        <td>{{ item.owner }}</td>
+        <td><span class="badge badge-status-{{ item.status|lower|replace(' ', '-') }}">{{ item.status }}</span></td>
+        <td><span class="badge badge-risk-{{ item.risk_level|lower }}">{{ item.risk_level }}</span></td>
+        <td>{{ item.due_date }}</td>
+        <td><a class="btn btn-secondary btn-small" href="{{ url_for('grc_edit', item_id=item.id) }}">Edit</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8">No items match the current filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

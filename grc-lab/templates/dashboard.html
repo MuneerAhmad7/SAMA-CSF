@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · GRC Lab{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>GRC Program Dashboard</h1>
+    <p class="subtitle">Live counts computed from the GRC Register, Policies, and Incident Log.</p>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-box">
+    <div class="stat-value">{{ total }}</div>
+    <div class="stat-label">GRC Register Items</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-value">{{ policy_count }}</div>
+    <div class="stat-label">Active Policies</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-value">{{ incident_count }}</div>
+    <div class="stat-label">Logged Incidents</div>
+  </div>
+  <div class="stat-box {{ 'alert' if open_high_critical > 0 }}">
+    <div class="stat-value">{{ open_high_critical }}</div>
+    <div class="stat-label">Open High/Critical Risk Items</div>
+  </div>
+  <div class="stat-box {{ 'alert' if open_incidents > 0 }}">
+    <div class="stat-value">{{ open_incidents }}</div>
+    <div class="stat-label">Open Incidents</div>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <div class="card">
+    <h2>Items by Category</h2>
+    {% for cat, count in by_category.items() %}
+      <div class="bar-row">
+        <span>{{ cat }}</span>
+        <div class="bar-track">
+          <div class="bar-fill {{ cat|lower|replace(' ', '-') }}"
+               style="width: {{ (count / total_for_pct * 100) if total_for_pct else 0 }}%;"></div>
+        </div>
+        <span>{{ count }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2>Items by Status</h2>
+    {% for status, count in by_status.items() %}
+      <div class="bar-row">
+        <span>{{ status }}</span>
+        <div class="bar-track">
+          <div class="bar-fill status-{{ status|lower|replace(' ', '-') }}"
+               style="width: {{ (count / total_for_pct * 100) if total_for_pct else 0 }}%;"></div>
+        </div>
+        <span>{{ count }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2>Items by Risk Level</h2>
+    {% for risk, count in by_risk.items() %}
+      <div class="bar-row">
+        <span>{{ risk }}</span>
+        <div class="bar-track">
+          <div class="bar-fill risk-{{ risk|lower }}"
+               style="width: {{ (count / total_for_pct * 100) if total_for_pct else 0 }}%;"></div>
+        </div>
+        <span>{{ count }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2>Quick Links</h2>
+    <p><a href="{{ url_for('grc_list', risk='Critical') }}">→ View all Critical risk items</a></p>
+    <p><a href="{{ url_for('grc_list', status='Not Started') }}">→ View items Not Started</a></p>
+    <p><a href="{{ url_for('policies') }}">→ Review policy acknowledgment rates</a></p>
+    <p><a href="{{ url_for('incidents') }}">→ Manage the incident log</a></p>
+  </div>
+</div>
+
+{% endblock %}

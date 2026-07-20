@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ item.grc_item }} · GRC Lab{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>{{ item.grc_item }}</h1>
+    <p class="subtitle">
+      <span class="badge badge-category-{{ item.category|lower|replace(' ', '-') }}">{{ item.category }}</span>
+      &nbsp;/&nbsp;{{ item.subcategory }}
+    </p>
+  </div>
+  <div>
+    <a class="btn btn-secondary" href="{{ url_for('grc_edit', item_id=item.id) }}">Edit</a>
+    <a class="btn btn-secondary" href="{{ url_for('grc_list') }}">Back to Register</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="detail-grid">
+    <div class="detail-field">
+      <label>Owner</label>
+      <p>{{ item.owner }}</p>
+    </div>
+    <div class="detail-field">
+      <label>Status</label>
+      <p><span class="badge badge-status-{{ item.status|lower|replace(' ', '-') }}">{{ item.status }}</span></p>
+    </div>
+    <div class="detail-field">
+      <label>Risk Level</label>
+      <p><span class="badge badge-risk-{{ item.risk_level|lower }}">{{ item.risk_level }}</span></p>
+    </div>
+    <div class="detail-field">
+      <label>Due Date</label>
+      <p>{{ item.due_date }}</p>
+    </div>
+
+    <div class="detail-field full">
+      <label>Description</label>
+      <p>{{ item.description }}</p>
+    </div>
+    <div class="detail-field full">
+      <label>Objective</label>
+      <p>{{ item.objective }}</p>
+    </div>
+    <div class="detail-field full">
+      <label>Implementation Steps</label>
+      <p>{{ item.implementation_steps }}</p>
+    </div>
+    <div class="detail-field full">
+      <label>Testing / Validation Method</label>
+      <p>{{ item.testing_method }}</p>
+    </div>
+    <div class="detail-field full">
+      <label>Mitigation Strategy</label>
+      <p>{{ item.mitigation_strategy }}</p>
+    </div>
+    <div class="detail-field">
+      <label>Compliance Standard</label>
+      <p>{{ item.compliance_standard }}</p>
+    </div>
+    <div class="detail-field full">
+      <label>Mock Data Example</label>
+      <p>{{ item.mock_data_example }}</p>
+    </div>
+    <div class="detail-field full">
+      <label>Notes</label>
+      <p>{{ item.notes }}</p>
+    </div>
+  </div>
+</div>
+
+<form method="post" action="{{ url_for('grc_delete', item_id=item.id) }}"
+      onsubmit="return confirm('Delete this GRC item? This cannot be undone.');">
+  <button class="btn btn-danger btn-small" type="submit">Delete Item</button>
+</form>
+
+{% endblock %}

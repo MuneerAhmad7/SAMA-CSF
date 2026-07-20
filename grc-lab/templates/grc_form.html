@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if item else 'New' }} GRC Item · GRC Lab{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>{{ 'Edit GRC Item' if item else 'New GRC Item' }}</h1>
+</div>
+
+<div class="card">
+  <form method="post">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category" required>
+          {% for c in categories %}
+            <option value="{{ c }}" {{ 'selected' if item and item.category == c }}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sub-Category</label>
+        <input type="text" name="subcategory" value="{{ item.subcategory if item else '' }}" required>
+      </div>
+
+      <div class="form-group full">
+        <label>GRC Item</label>
+        <input type="text" name="grc_item" value="{{ item.grc_item if item else '' }}" required>
+      </div>
+
+      <div class="form-group full">
+        <label>Description</label>
+        <textarea name="description">{{ item.description if item else '' }}</textarea>
+      </div>
+
+      <div class="form-group full">
+        <label>Objective</label>
+        <textarea name="objective">{{ item.objective if item else '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Owner</label>
+        <input type="text" name="owner" value="{{ item.owner if item else '' }}">
+      </div>
+      <div class="form-group">
+        <label>Due Date</label>
+        <input type="text" name="due_date" placeholder="YYYY-MM-DD" value="{{ item.due_date if item else '' }}">
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          {% for s in statuses %}
+            <option value="{{ s }}" {{ 'selected' if item and item.status == s }}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Risk Level</label>
+        <select name="risk_level">
+          {% for r in risks %}
+            <option value="{{ r }}" {{ 'selected' if item and item.risk_level == r }}>{{ r }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group full">
+        <label>Implementation Steps</label>
+        <textarea name="implementation_steps">{{ item.implementation_steps if item else '' }}</textarea>
+      </div>
+
+      <div class="form-group full">
+        <label>Testing / Validation Method</label>
+        <textarea name="testing_method">{{ item.testing_method if item else '' }}</textarea>
+      </div>
+
+      <div class="form-group full">
+        <label>Mitigation Strategy</label>
+        <textarea name="mitigation_strategy">{{ item.mitigation_strategy if item else '' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Compliance Standard</label>
+        <input type="text" name="compliance_standard" value="{{ item.compliance_standard if item else '' }}">
+      </div>
+
+      <div class="form-group full">
+        <label>Mock Data Example</label>
+        <textarea name="mock_data_example">{{ item.mock_data_example if item else '' }}</textarea>
+      </div>
+
+      <div class="form-group full">
+        <label>Notes</label>
+        <textarea name="notes">{{ item.notes if item else '' }}</textarea>
+      </div>
+    </div>
+
+    <button class="btn" type="submit">{{ 'Save Changes' if item else 'Create Item' }}</button>
+    <a class="btn btn-secondary" href="{{ url_for('grc_list') }}">Cancel</a>
+  </form>
+</div>
+
+{% endblock %}

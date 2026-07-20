@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GRC Lab{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand">🛡️ GRC Implementation Lab</div>
+    <nav>
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Dashboard</a>
+      <a href="{{ url_for('grc_list') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('grc_') }}">GRC Register</a>
+      <a href="{{ url_for('policies') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('policy') }}">Policies</a>
+      <a href="{{ url_for('incidents') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('incident') }}">Incidents</a>
+    </nav>
+  </div>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer>GRC Lab &middot; Flask + Docker demo environment &middot; mock data for training purposes only</footer>
+</body>
+</html>

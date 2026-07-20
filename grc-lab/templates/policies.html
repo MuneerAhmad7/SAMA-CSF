@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Policies · GRC Lab{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Policy Management</h1>
+    <p class="subtitle">Simulates the Governance / Policy Management control: publish policies and track employee acknowledgment.</p>
+  </div>
+  <a class="btn" href="{{ url_for('policy_new') }}">+ New Policy</a>
+</div>
+
+<div class="policy-grid">
+  {% for policy in policies %}
+  <div class="card">
+    <h2>{{ policy.name }} <small style="color:#6b7280; font-weight:normal;">v{{ policy.version }}</small></h2>
+    <p style="font-size:0.88rem;">{{ policy.description }}</p>
+    <p style="font-size:0.8rem; color:#6b7280;">Effective: {{ policy.effective_date }} &middot; Category: {{ policy.category }}</p>
+
+    <label style="font-size:0.78rem; color:#6b7280; text-transform:uppercase;">
+      {{ policy.ack_count() }} acknowledgment(s)
+    </label>
+    <div class="progress-track">
+      <div class="progress-fill" style="width: {{ [policy.ack_count() * 20, 100]|min }}%;"></div>
+    </div>
+
+    {% if policy.acknowledgments %}
+    <div class="ack-list">
+      {% for ack in policy.acknowledgments %}
+        {{ ack.employee_name }} — {{ ack.acknowledged_at.strftime('%Y-%m-%d') }}<br>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('policy_acknowledge', policy_id=policy.id) }}" class="ack-form">
+      <input type="text" name="employee_name" placeholder="Employee name" required>
+      <button class="btn btn-small" type="submit">Acknowledge</button>
+    </form>
+  </div>
+  {% else %}
+  <p>No policies published yet.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

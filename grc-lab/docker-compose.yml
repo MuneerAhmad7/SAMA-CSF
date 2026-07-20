@@ -1,0 +1,14 @@
+services:
+  web:
+    build: .
+    container_name: grc-lab
+    ports:
+      - "5000:5000"
+    volumes:
+      - grc_data:/app/data
+    environment:
+      - SECRET_KEY=grc-lab-dev-secret
+    restart: unless-stopped
+
+volumes:
+  grc_data:

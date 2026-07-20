@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Incidents · GRC Lab{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Incident Log</h1>
+    <p class="subtitle">Simulates the Risk Management / Incident Response control: log, triage, and track incidents to closure.</p>
+  </div>
+  <a class="btn" href="{{ url_for('incident_new') }}">+ Log Incident</a>
+</div>
+
+<div class="incident-grid">
+  {% for inc in incidents %}
+  <div class="card">
+    <h2>{{ inc.title }}</h2>
+    <p style="font-size:0.88rem;">{{ inc.description }}</p>
+    <p style="font-size:0.82rem; color:#6b7280;">
+      Reported by {{ inc.reported_by }} on {{ inc.reported_at.strftime('%Y-%m-%d') }}
+      {% if inc.resolved_at %} &middot; Resolved {{ inc.resolved_at.strftime('%Y-%m-%d') }}{% endif %}
+    </p>
+
+    <p>
+      <span class="badge badge-risk-{{ inc.severity|lower }}">{{ inc.severity }} severity</span>
+      <span class="badge badge-{{ inc.status|lower }}">{{ inc.status }}</span>
+    </p>
+
+    <form method="post" action="{{ url_for('incident_update_status', incident_id=inc.id) }}" style="display:flex; gap:0.5rem;">
+      <select name="status">
+        {% for s in statuses %}
+          <option value="{{ s }}" {{ 'selected' if inc.status == s }}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-secondary btn-small" type="submit">Update Status</button>
+    </form>
+  </div>
+  {% else %}
+  <p>No incidents logged yet.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

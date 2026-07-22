@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<p class="eyebrow">{{ sc.regulator }}</p>
+<h1 class="page-title">Risk Register — {{ sc.name }}</h1>
+<p class="lede">Risk score = Likelihood × Impact. Ranked highest first — this ranking is your treatment priority order.</p>
+
+<div class="btn-row" style="margin-bottom:26px;">
+  <a class="btn" href="{{ url_for('exercise', scenario=scenario) }}">← Edit ratings</a>
+  <a class="btn" href="{{ url_for('index') }}">Overview</a>
+</div>
+
+<div class="card">
+  <table class="risk-table">
+    <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Score</th><th>Treatment</th></tr></thead>
+    <tbody>
+      {% for row in computed.rows %}
+      <tr>
+        <td><span class="stamp muted" style="margin-right:8px;">{{ row.id }}</span>{{ row.label }}</td>
+        <td>{{ row.likelihood }}</td>
+        <td>{{ row.impact }}</td>
+        <td><span class="risk-score {{ row.heat }}">{{ row.score }}</span></td>
+        <td>{{ row.treatment }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card" style="margin-top:26px;">
+  <h2 class="section-title">Top 3 priority risks</h2>
+  <ul class="priority-list">
+    {% for row in computed.top %}
+    <li>
+      <span class="priority-num">{{ loop.index }}</span>
+      <span class="stamp">{{ row.id }}</span>
+      <span>{{ row.label }} — score {{ row.score }} ({{ row.treatment }})</span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+{% endblock %}

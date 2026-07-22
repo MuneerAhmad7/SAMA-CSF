@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+<p class="eyebrow">{{ sc.regulator }}</p>
+<h1 class="page-title">{{ sc.name }} — Risk Register</h1>
+<p class="lede">{{ sc.context }} Rate each risk's likelihood and impact (1–5) and choose a treatment.
+  <a href="{{ url_for('reset', scenario=scenario) }}" style="color:var(--seal); text-decoration:underline;">Reset to suggested ratings</a></p>
+
+<form method="post" action="{{ url_for('exercise', scenario=scenario) }}">
+  <div class="domain-block">
+    <div class="domain-head"><span class="stamp">RISK</span><h3>Risk register</h3></div>
+    {% for item in sc.entries %}
+    <div class="control-row">
+      <div><span class="stamp">{{ item.id }}</span></div>
+      <div>
+        <div class="ctitle">{{ item.label }}</div>
+        <div class="cdesc">{{ item.desc }}</div>
+        <div class="field-inline" style="margin-top:10px;">
+          <div>
+            <label class="rg-title" style="display:block; margin-bottom:4px;">Likelihood</label>
+            <select name="like__{{ item.id }}">
+              {% for n in range(1,6) %}
+              <option value="{{ n }}" {% if (answers.get('like__'+item.id, item.likelihood)|int)==n %}selected{% endif %}>{{ n }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="rg-title" style="display:block; margin-bottom:4px;">Impact</label>
+            <select name="impact__{{ item.id }}">
+              {% for n in range(1,6) %}
+              <option value="{{ n }}" {% if (answers.get('impact__'+item.id, item.impact)|int)==n %}selected{% endif %}>{{ n }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="rg-title" style="display:block; margin-bottom:4px;">Treatment</label>
+            <select name="treat__{{ item.id }}">
+              {% for t in ['Accept','Mitigate','Transfer','Avoid'] %}
+              <option value="{{ t }}" {% if answers.get('treat__'+item.id, item.treatment)==t %}selected{% endif %}>{{ t }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="form-actions">
+    <a class="btn" href="{{ url_for('index') }}">← Overview</a>
+    <button class="btn btn-primary" type="submit">Generate risk register →</button>
+  </div>
+</form>
+
+{% endblock %}

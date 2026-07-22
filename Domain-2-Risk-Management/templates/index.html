@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<p class="eyebrow">{{ lab.eyebrow }}</p>
+<h1 class="page-title">{{ lab.title }}</h1>
+<p class="lede">{{ lab.topic_intro }}</p>
+
+{% if lab.key_points %}
+<div class="card" style="margin-bottom:30px;">
+  <h2 class="section-title">Key concepts</h2>
+  <ul class="finding-list">
+    {% for k in lab.key_points %}
+    <li>{{ k }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<h2 class="section-title">Work the exercise in a scenario</h2>
+<div class="grid-2">
+  {% for sid, sc in lab.scenarios.items() %}
+  <div class="fw-card">
+    <span class="reg">{{ sc.regulator }}</span>
+    <h3>{{ sc.name }}</h3>
+    <p style="color:var(--paper-dim); font-size:13.5px; margin:0;">{{ sc.context }}</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="{{ url_for('exercise', scenario=sid) }}">Start exercise →</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

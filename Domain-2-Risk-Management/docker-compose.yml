@@ -1,0 +1,9 @@
+services:
+  grc-lab-02:
+    build: .
+    container_name: grc-lab-02-risk-management
+    ports:
+      - "5002:5000"
+    environment:
+      - SECRET_KEY=change-this-in-any-real-deployment
+    restart: unless-stopped

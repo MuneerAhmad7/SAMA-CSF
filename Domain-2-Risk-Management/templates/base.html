@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ lab.title }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="frame">
+    <header class="topbar">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-mark">{{ lab.lab_number }}</span>
+        <span class="brand-text">{{ lab.title }}</span>
+      </a>
+      <nav class="topnav">
+        <a href="{{ url_for('index') }}">Overview</a>
+      </nav>
+    </header>
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+      <span>Practical GRC Lab Suite · Saudi market scenarios (SAMA / NCA / PDPL) · educational, not a certified audit tool</span>
+    </footer>
+  </div>
+</body>
+</html>
